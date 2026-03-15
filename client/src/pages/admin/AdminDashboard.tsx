@@ -1,0 +1,235 @@
+import { useEffect, useState } from 'react'
+import { useNavigate, Routes, Route, NavLink } from 'react-router-dom'
+import {
+  Box, Typography, Drawer, List, ListItemButton, ListItemIcon,
+  ListItemText, Button, CircularProgress, Divider, Avatar, Tooltip,
+} from '@mui/material'
+import DashboardIcon from '@mui/icons-material/Dashboard'
+import EmailIcon from '@mui/icons-material/Email'
+import FolderIcon from '@mui/icons-material/Folder'
+import DescriptionIcon from '@mui/icons-material/Description'
+import CodeIcon from '@mui/icons-material/Code'
+import BarChartIcon from '@mui/icons-material/BarChart'
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
+import LogoutIcon from '@mui/icons-material/Logout'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import { useAuth } from '../../hooks/useAuth'
+import { fetchDashboardStats } from '../../api/admin'
+import type { DashboardStats } from '../../api/admin'
+import GlassCard from '../../components/ui/GlassCard'
+import AdminMessagesViewer from './AdminMessagesViewer'
+import AdminProjectsManager from './AdminProjectsManager'
+import AdminSkillsManager from './AdminSkillsManager'
+import AdminStatsManager from './AdminStatsManager'
+import AdminResumeManager from './AdminResumeManager'
+import AdminAchievementsManager from './AdminAchievementsManager'
+
+const DRAWER_WIDTH = 240
+
+function DashboardHome() {
+  const [stats, setStats] = useState<DashboardStats | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchDashboardStats().then(setStats).finally(() => setLoading(false))
+  }, [])
+
+  if (loading) return (
+    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
+      <CircularProgress sx={{ color: '#00B4D8' }} />
+    </Box>
+  )
+
+  const cards = [
+    { label: 'Total Messages', value: stats?.total_messages ?? 0, color: '#00B4D8', bg: 'rgba(0,180,216,0.1)' },
+    { label: 'Unread', value: stats?.unread_messages ?? 0, color: '#F59E0B', bg: 'rgba(245,158,11,0.1)' },
+    { label: 'Projects', value: stats?.total_projects ?? 0, color: '#7C3AED', bg: 'rgba(124,58,237,0.1)' },
+    { label: 'Active Resume', value: stats?.active_resume ?? 'None', color: '#10B981', bg: 'rgba(16,185,129,0.1)' },
+  ]
+
+  return (
+    <Box>
+      <Box sx={{ mb: 5 }}>
+        <Typography variant="h4" fontWeight={800} color="#E2E8F0">Overview</Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+          Your portfolio at a glance.
+        </Typography>
+      </Box>
+      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' }, gap: 3 }}>
+        {cards.map((c) => (
+          <GlassCard key={c.label} hover={false} sx={{ p: 3, border: `1px solid ${c.color}22` }}>
+            <Box sx={{
+              width: 36, height: 36, borderRadius: 2, mb: 2,
+              background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Box sx={{ width: 10, height: 10, borderRadius: '50%', background: c.color }} />
+            </Box>
+            <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: 1.2, fontSize: 11 }}>
+              {c.label}
+            </Typography>
+            <Typography variant="h4" fontWeight={800} sx={{ color: c.color, mt: 0.5 }}>
+              {c.value}
+            </Typography>
+          </GlassCard>
+        ))}
+      </Box>
+    </Box>
+  )
+}
+
+export default function AdminDashboard() {
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    logout()
+    navigate('/admin/login')
+  }
+
+  const navItems = [
+    { label: 'Overview', path: '/admin/dashboard', icon: <DashboardIcon fontSize="small" />, end: true },
+    { label: 'Messages', path: '/admin/messages', icon: <EmailIcon fontSize="small" /> },
+    { label: 'Projects', path: '/admin/projects', icon: <FolderIcon fontSize="small" /> },
+    { label: 'Skills', path: '/admin/skills', icon: <CodeIcon fontSize="small" /> },
+    { label: 'Stats', path: '/admin/stats', icon: <BarChartIcon fontSize="small" /> },
+    { label: 'Achievements', path: '/admin/achievements', icon: <EmojiEventsIcon fontSize="small" /> },
+    { label: 'Resume', path: '/admin/resume', icon: <DescriptionIcon fontSize="small" /> },
+  ]
+
+  return (
+    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#080D1A' }}>
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: DRAWER_WIDTH,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: DRAWER_WIDTH,
+            boxSizing: 'border-box',
+            bgcolor: '#0A0F1E',
+            borderRight: '1px solid rgba(0,180,216,0.1)',
+            display: 'flex',
+            flexDirection: 'column',
+          },
+        }}
+      >
+        {/* Logo / Brand */}
+        <Box sx={{ p: 2.5, pb: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Box sx={{
+              width: 36, height: 36, borderRadius: 2, flexShrink: 0,
+              background: 'linear-gradient(135deg, #00B4D8, #7C3AED)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <Typography sx={{ color: '#fff', fontWeight: 900, fontSize: 16, lineHeight: 1 }}>S</Typography>
+            </Box>
+            <Box>
+              <Typography fontWeight={800} sx={{
+                background: 'linear-gradient(135deg, #00B4D8, #7C3AED)',
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                fontSize: 15, lineHeight: 1.2,
+              }}>
+                Shashank
+              </Typography>
+              <Typography variant="caption" color="text.secondary" sx={{ fontSize: 11 }}>Admin Panel</Typography>
+            </Box>
+          </Box>
+        </Box>
+
+        <Divider sx={{ borderColor: 'rgba(0,180,216,0.08)', mx: 2 }} />
+
+        {/* Nav */}
+        <List sx={{ flex: 1, pt: 1.5, px: 1 }}>
+          <Typography variant="overline" sx={{ px: 1.5, color: '#334155', fontSize: 10, letterSpacing: 1.5 }}>
+            Navigation
+          </Typography>
+          {navItems.map((item) => (
+            <ListItemButton
+              key={item.path}
+              component={NavLink}
+              to={item.path}
+              end={item.end}
+              sx={{
+                borderRadius: 2, mb: 0.5, mt: 0.5, py: 1,
+                color: '#64748B',
+                '&.active': {
+                  bgcolor: 'rgba(0,180,216,0.1)',
+                  color: '#00B4D8',
+                  '& .MuiListItemIcon-root': { color: '#00B4D8' },
+                },
+                '&:hover:not(.active)': { bgcolor: 'rgba(255,255,255,0.04)', color: '#94A3B8' },
+              }}
+            >
+              <ListItemIcon sx={{ minWidth: 32, color: 'inherit' }}>{item.icon}</ListItemIcon>
+              <ListItemText
+                primary={item.label}
+                slotProps={{ primary: { style: { fontSize: 14, fontWeight: 600 } } }}
+              />
+            </ListItemButton>
+          ))}
+        </List>
+
+        <Divider sx={{ borderColor: 'rgba(0,180,216,0.08)', mx: 2 }} />
+
+        {/* Bottom section */}
+        <Box sx={{ p: 2 }}>
+          <Tooltip title="View live portfolio" placement="right">
+            <Button
+              fullWidth
+              component="a"
+              href="/"
+              target="_blank"
+              endIcon={<OpenInNewIcon sx={{ fontSize: '14px !important' }} />}
+              sx={{
+                justifyContent: 'flex-start', textTransform: 'none', color: '#475569',
+                fontSize: 13, mb: 1,
+                '&:hover': { color: '#00B4D8', bgcolor: 'rgba(0,180,216,0.06)' },
+              }}
+            >
+              View Portfolio
+            </Button>
+          </Tooltip>
+
+          {/* User info */}
+          <Box sx={{
+            display: 'flex', alignItems: 'center', gap: 1.5, p: 1.5,
+            borderRadius: 2, bgcolor: 'rgba(255,255,255,0.03)', mb: 1,
+          }}>
+            <Avatar sx={{ width: 30, height: 30, fontSize: 13, bgcolor: 'rgba(0,180,216,0.2)', color: '#00B4D8' }}>
+              {user?.email?.[0]?.toUpperCase() ?? 'A'}
+            </Avatar>
+            <Typography variant="caption" color="text.secondary" noWrap sx={{ flex: 1, fontSize: 12 }}>
+              {user?.email ?? 'Admin'}
+            </Typography>
+          </Box>
+
+          <Button
+            fullWidth
+            startIcon={<LogoutIcon fontSize="small" />}
+            onClick={handleLogout}
+            sx={{
+              justifyContent: 'flex-start', textTransform: 'none',
+              color: '#475569', fontSize: 13,
+              '&:hover': { color: '#EF4444', bgcolor: 'rgba(239,68,68,0.06)' },
+            }}
+          >
+            Logout
+          </Button>
+        </Box>
+      </Drawer>
+
+      <Box component="main" sx={{ flexGrow: 1, p: { xs: 3, md: 5 }, overflow: 'auto', minHeight: '100vh' }}>
+        <Routes>
+          <Route index element={<DashboardHome />} />
+          <Route path="dashboard" element={<DashboardHome />} />
+          <Route path="messages" element={<AdminMessagesViewer />} />
+          <Route path="projects" element={<AdminProjectsManager />} />
+          <Route path="skills" element={<AdminSkillsManager />} />
+          <Route path="stats" element={<AdminStatsManager />} />
+          <Route path="achievements" element={<AdminAchievementsManager />} />
+          <Route path="resume" element={<AdminResumeManager />} />
+        </Routes>
+      </Box>
+    </Box>
+  )
+}
