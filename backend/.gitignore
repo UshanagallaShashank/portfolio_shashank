@@ -9,10 +9,11 @@ node_modules/
 .env.development
 .env.production
 .env.test
+*venv
 
 # Logs
 logs/
-__pycache__/
+*__pycache__/
 *.py[cod]
 *.pyo
 .Python

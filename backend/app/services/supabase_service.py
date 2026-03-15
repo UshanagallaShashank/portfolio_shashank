@@ -76,6 +76,13 @@ class SupabaseService:
         res = self.db.table("resume_versions").insert(data).execute()
         return res.data[0]
 
+    def get_resume_version(self, resume_id: str) -> Optional[Dict]:
+        res = self.db.table("resume_versions").select("*").eq("id", resume_id).maybe_single().execute()
+        return res.data
+
+    def delete_resume_version(self, resume_id: str) -> None:
+        self.db.table("resume_versions").delete().eq("id", resume_id).execute()
+
     def activate_resume(self, resume_id: str) -> Dict:
         self.db.table("resume_versions").update({"is_active": False}).neq("id", resume_id).execute()
         res = self.db.table("resume_versions").update({"is_active": True}).eq("id", resume_id).execute()
