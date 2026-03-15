@@ -13,9 +13,11 @@ node_modules/
 
 # Logs
 logs/
-*__pycache__/
+__pycache__/
+**/__pycache__/
 *.py[cod]
 *.pyo
+*.pyc
 .Python
 *.log
 npm-debug.log*
