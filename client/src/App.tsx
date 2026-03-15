@@ -1,7 +1,13 @@
 import AppRouter from './router/AppRouter'
+import ChatbotWidget from './components/chatbot/ChatbotWidget'
 
 function App() {
-  return <AppRouter />
+  return (
+    <>
+      <AppRouter />
+      <ChatbotWidget />
+    </>
+  )
 }
 
 export default App
