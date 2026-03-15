@@ -1,0 +1,42 @@
+export const tokens = {
+  colors: {
+    bgPrimary: '#0A0E1A',
+    bgSecondary: '#0F1629',
+    bgCard: '#141c30',
+    primary: '#00B4D8',
+    primaryLight: '#48CAE4',
+    primaryDark: '#0096B7',
+    accent: '#7C3AED',
+    accentLight: '#A855F7',
+    success: '#10B981',
+    warning: '#F59E0B',
+    error: '#EF4444',
+    textPrimary: '#E2E8F0',
+    textSecondary: '#94A3B8',
+    textMuted: '#64748B',
+    border: 'rgba(0, 180, 216, 0.15)',
+    borderStrong: 'rgba(0, 180, 216, 0.35)',
+    // Light mode
+    lightBg: '#F0F7FF',
+    lightBgCard: '#FFFFFF',
+    lightBgSecondary: '#E8F4FD',
+    lightTextPrimary: '#0F172A',
+    lightTextSecondary: '#475569',
+  },
+  gradients: {
+    primary: 'linear-gradient(135deg, #00B4D8 0%, #7C3AED 100%)',
+    hero: 'linear-gradient(135deg, #0A0E1A 0%, #0F1629 50%, #141c30 100%)',
+    card: 'linear-gradient(135deg, rgba(0,180,216,0.05) 0%, rgba(124,58,237,0.05) 100%)',
+    glow: 'radial-gradient(ellipse at top, rgba(0,180,216,0.15) 0%, transparent 70%)',
+  },
+  shadows: {
+    card: '0 4px 24px rgba(0,0,0,0.3)',
+    glow: '0 0 20px rgba(0,180,216,0.2)',
+    glowStrong: '0 0 40px rgba(0,180,216,0.35)',
+    accentGlow: '0 0 20px rgba(124,58,237,0.3)',
+  },
+  spacing: {
+    navHeight: '70px',
+    sectionPadding: '80px',
+  },
+}
