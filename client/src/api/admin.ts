@@ -7,31 +7,28 @@ export interface DashboardStats {
   active_resume: string | null
 }
 
-export const adminLogin = (email: string, password: string) =>
-  apiClient.post<{ access_token: string }>('/api/admin/login', { email, password }).then((r) => r.data)
-
-export const getDashboardStats = () =>
-  apiClient.get<DashboardStats>('/api/admin/dashboard').then((r) => r.data)
-
-export const getMessages = () =>
-  apiClient.get('/api/messages').then((r) => r.data)
-
-export const markMessageRead = (id: string) =>
-  apiClient.put(`/api/messages/${id}/read`).then((r) => r.data)
-
-export const deleteMessage = (id: string) =>
-  apiClient.delete(`/api/messages/${id}`).then((r) => r.data)
-
-export const uploadResume = (file: File) => {
-  const fd = new FormData()
-  fd.append('file', file)
-  return apiClient.post('/api/resume/upload', fd, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  }).then((r) => r.data)
+export interface Message {
+  id: string
+  sender_name: string
+  sender_email: string
+  subject: string | null
+  body: string
+  allow_email: boolean
+  is_read: boolean
+  created_at: string
 }
 
-export const getResumeVersions = () =>
-  apiClient.get('/api/resume/versions').then((r) => r.data)
+export const adminLogin = (email: string, password: string) =>
+  apiClient.post<{ access_token: string; token_type: string }>('/api/admin/login', { email, password }).then((r) => r.data)
 
-export const activateResume = (id: string) =>
-  apiClient.put(`/api/resume/${id}/activate`).then((r) => r.data)
+export const fetchDashboardStats = () =>
+  apiClient.get<DashboardStats>('/api/admin/dashboard').then((r) => r.data)
+
+export const fetchMessages = () =>
+  apiClient.get<Message[]>('/api/messages').then((r) => r.data)
+
+export const markMessageRead = (id: string) =>
+  apiClient.patch(`/api/messages/${id}/read`).then((r) => r.data)
+
+export const deleteMessage = (id: string) =>
+  apiClient.delete(`/api/messages/${id}`)

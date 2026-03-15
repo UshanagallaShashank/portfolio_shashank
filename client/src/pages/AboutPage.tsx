@@ -20,7 +20,7 @@ export default function AboutPage() {
         />
 
         <Grid container spacing={6} alignItems="center" sx={{ mb: 10 }} ref={ref}>
-          <Grid item xs={12} md={5}>
+          <Grid size={{ xs: 12, md: 5 }}>
             <motion.div variants={fadeInLeft} initial="hidden" animate={inView ? 'visible' : 'hidden'}>
               <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                 <Box sx={{ position: 'relative' }}>
@@ -41,7 +41,7 @@ export default function AboutPage() {
             </motion.div>
           </Grid>
 
-          <Grid item xs={12} md={7}>
+          <Grid size={{ xs: 12, md: 7 }}>
             <motion.div variants={fadeInRight} initial="hidden" animate={inView ? 'visible' : 'hidden'}>
               <Typography variant="h4" fontWeight={700} sx={{ mb: 2, color: '#E2E8F0' }}>
                 Full-Stack Developer &{' '}

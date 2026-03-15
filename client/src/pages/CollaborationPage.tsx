@@ -90,7 +90,7 @@ export default function CollaborationPage() {
         <Divider sx={{ borderColor: 'rgba(0,180,216,0.15)', mb: 6 }} />
 
         <Grid container spacing={3}>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <GlassCard sx={{ p: 4 }}>
               <Typography variant="h6" fontWeight={700} sx={{ color: '#E2E8F0', mb: 1 }}>Giftedict</Typography>
               <Typography color="text.secondary" sx={{ mb: 3, lineHeight: 1.7 }}>
@@ -105,7 +105,7 @@ export default function CollaborationPage() {
               </Button>
             </GlassCard>
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <GlassCard sx={{ p: 4, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
               <Typography variant="h6" sx={{ mb: 1, color: '#E2E8F0' }}>More Projects</Typography>
               <Typography color="text.secondary" sx={{ mb: 2 }}>

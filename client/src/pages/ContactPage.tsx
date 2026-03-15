@@ -47,7 +47,7 @@ export default function ContactPage() {
         />
 
         <Grid container spacing={6}>
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               {contactInfo.map((info) => (
                 <motion.div key={info.label} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
@@ -74,7 +74,7 @@ export default function ContactPage() {
             </Box>
           </Grid>
 
-          <Grid item xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 8 }}>
             <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
               <GlassCard sx={{ p: 4 }}>
                 {success ? (
@@ -88,7 +88,7 @@ export default function ContactPage() {
                 ) : (
                   <Box component="form" onSubmit={handleSubmit}>
                     <Grid container spacing={2}>
-                      <Grid item xs={12} sm={6}>
+                      <Grid size={{ xs: 12, sm: 6 }}>
                         <TextField
                           fullWidth label="Your Name" required
                           value={form.sender_name}
@@ -96,7 +96,7 @@ export default function ContactPage() {
                           variant="outlined" size="small"
                         />
                       </Grid>
-                      <Grid item xs={12} sm={6}>
+                      <Grid size={{ xs: 12, sm: 6 }}>
                         <TextField
                           fullWidth label="Your Email" type="email" required
                           value={form.sender_email}
@@ -104,7 +104,7 @@ export default function ContactPage() {
                           variant="outlined" size="small"
                         />
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid size={12}>
                         <TextField
                           fullWidth label="Subject"
                           value={form.subject}
@@ -112,7 +112,7 @@ export default function ContactPage() {
                           variant="outlined" size="small"
                         />
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid size={12}>
                         <TextField
                           fullWidth label="Message" required multiline rows={5}
                           value={form.body}
@@ -120,7 +120,7 @@ export default function ContactPage() {
                           variant="outlined"
                         />
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid size={12}>
                         <FormControlLabel
                           control={
                             <Checkbox
@@ -137,11 +137,11 @@ export default function ContactPage() {
                         />
                       </Grid>
                       {error && (
-                        <Grid item xs={12}>
+                        <Grid size={12}>
                           <Alert severity="error" sx={{ background: 'rgba(239,68,68,0.1)', color: '#EF4444' }}>{error}</Alert>
                         </Grid>
                       )}
-                      <Grid item xs={12}>
+                      <Grid size={12}>
                         <Button
                           type="submit" variant="contained" fullWidth disabled={loading}
                           endIcon={loading ? <CircularProgress size={18} color="inherit" /> : <SendIcon />}

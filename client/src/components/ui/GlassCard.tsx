@@ -1,8 +1,9 @@
-import { Box, BoxProps } from '@mui/material'
+import { Box } from '@mui/material'
 import { motion } from 'framer-motion'
 import { useTheme } from '../../context/ThemeContext'
+import type { ComponentProps } from 'react'
 
-interface Props extends BoxProps {
+interface Props extends Omit<ComponentProps<typeof Box>, 'component'> {
   hover?: boolean
   glow?: boolean
 }

@@ -1,124 +1,83 @@
-import { useState, useEffect } from 'react'
-import {
-  Box, Typography, Chip, IconButton, Tooltip,
-  Table, TableBody, TableCell, TableHead, TableRow, CircularProgress,
-} from '@mui/material'
+import { useEffect, useState } from 'react'
+import { Box, Typography, CircularProgress, IconButton, Tooltip, Chip, Divider } from '@mui/material'
 import MarkEmailReadIcon from '@mui/icons-material/MarkEmailRead'
 import DeleteIcon from '@mui/icons-material/Delete'
-import EmailIcon from '@mui/icons-material/Email'
 import GlassCard from '../../components/ui/GlassCard'
-import { getMessages, markMessageRead, deleteMessage } from '../../api/admin'
-
-interface Message {
-  id: string
-  sender_name: string
-  sender_email: string
-  subject: string
-  body: string
-  allow_email: boolean
-  is_read: boolean
-  created_at: string
-}
+import { fetchMessages, markMessageRead, deleteMessage } from '../../api/admin'
+import type { Message } from '../../api/admin'
 
 export default function AdminMessagesViewer() {
   const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(true)
 
-  const load = () => {
-    getMessages().then(setMessages).catch(() => {}).finally(() => setLoading(false))
-  }
+  const load = () => fetchMessages().then(setMessages).finally(() => setLoading(false))
 
   useEffect(() => { load() }, [])
 
-  const handleRead = async (id: string) => {
-    await markMessageRead(id).catch(() => {})
+  const handleMarkRead = async (id: string) => {
+    await markMessageRead(id)
     setMessages((prev) => prev.map((m) => m.id === id ? { ...m, is_read: true } : m))
   }
 
   const handleDelete = async (id: string) => {
-    await deleteMessage(id).catch(() => {})
+    await deleteMessage(id)
     setMessages((prev) => prev.filter((m) => m.id !== id))
   }
 
+  if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}><CircularProgress sx={{ color: '#00B4D8' }} /></Box>
+
   return (
     <Box>
-      <Typography variant="h5" fontWeight={700} sx={{ color: '#E2E8F0', mb: 4 }}>
-        Messages
-        {messages.filter((m) => !m.is_read).length > 0 && (
-          <Chip
-            label={`${messages.filter((m) => !m.is_read).length} unread`}
-            size="small"
-            sx={{ ml: 2, background: 'rgba(239,68,68,0.15)', color: '#EF4444', border: '1px solid rgba(239,68,68,0.3)' }}
-          />
-        )}
-      </Typography>
-
-      <GlassCard sx={{ p: 3 }}>
-        {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-            <CircularProgress sx={{ color: '#00B4D8' }} />
-          </Box>
-        ) : (
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                {['From', 'Subject', 'Email Opt-in', 'Date', 'Actions'].map((h) => (
-                  <TableCell key={h} sx={{ color: '#64748B', borderBottom: '1px solid rgba(0,180,216,0.15)', fontWeight: 600 }}>{h}</TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {messages.map((msg) => (
-                <TableRow key={msg.id} sx={{ background: msg.is_read ? 'transparent' : 'rgba(0,180,216,0.04)' }}>
-                  <TableCell sx={{ borderBottom: '1px solid rgba(0,180,216,0.08)' }}>
-                    <Box>
-                      <Typography variant="body2" fontWeight={msg.is_read ? 400 : 700} sx={{ color: '#E2E8F0' }}>{msg.sender_name}</Typography>
-                      <Typography variant="caption" color="text.secondary">{msg.sender_email}</Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell sx={{ color: '#94A3B8', borderBottom: '1px solid rgba(0,180,216,0.08)', maxWidth: 200 }}>
-                    <Box>
-                      <Typography variant="body2" sx={{ color: '#E2E8F0' }} noWrap>{msg.subject || '(No subject)'}</Typography>
-                      <Typography variant="caption" color="text.secondary" noWrap>{msg.body}</Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell sx={{ borderBottom: '1px solid rgba(0,180,216,0.08)' }}>
-                    {msg.allow_email ? (
-                      <Chip icon={<EmailIcon />} label="Yes" size="small" sx={{ background: 'rgba(16,185,129,0.15)', color: '#10B981', fontSize: '0.7rem' }} />
-                    ) : (
-                      <Chip label="No" size="small" sx={{ background: 'rgba(100,116,139,0.1)', color: '#64748B', fontSize: '0.7rem' }} />
-                    )}
-                  </TableCell>
-                  <TableCell sx={{ color: '#64748B', borderBottom: '1px solid rgba(0,180,216,0.08)', fontSize: '0.75rem', whiteSpace: 'nowrap' }}>
-                    {new Date(msg.created_at).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell sx={{ borderBottom: '1px solid rgba(0,180,216,0.08)' }}>
-                    <Box sx={{ display: 'flex', gap: 0.5 }}>
-                      {!msg.is_read && (
-                        <Tooltip title="Mark as read">
-                          <IconButton size="small" onClick={() => handleRead(msg.id)} sx={{ color: '#00B4D8' }}>
-                            <MarkEmailReadIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                      <Tooltip title="Delete">
-                        <IconButton size="small" onClick={() => handleDelete(msg.id)} sx={{ color: '#64748B', '&:hover': { color: '#EF4444' } }}>
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))}
-              {messages.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={5} sx={{ textAlign: 'center', py: 6, color: '#64748B' }}>No messages yet.</TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        )}
-      </GlassCard>
+      <Typography variant="h4" fontWeight={700} color="#E2E8F0" sx={{ mb: 4 }}>Messages</Typography>
+      {messages.length === 0 && (
+        <Typography color="text.secondary">No messages yet.</Typography>
+      )}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {messages.map((msg) => (
+          <GlassCard key={msg.id} hover={false} sx={{ p: 3, opacity: msg.is_read ? 0.7 : 1 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+              <Box>
+                <Typography fontWeight={700} color="#E2E8F0" sx={{ display: 'inline', mr: 1 }}>
+                  {msg.sender_name}
+                </Typography>
+                <Typography component="span" variant="body2" color="text.secondary">
+                  &lt;{msg.sender_email}&gt;
+                </Typography>
+                {!msg.is_read && (
+                  <Chip label="Unread" size="small" sx={{ ml: 1, bgcolor: 'rgba(0,180,216,0.15)', color: '#00B4D8', height: 20 }} />
+                )}
+              </Box>
+              <Box sx={{ display: 'flex', gap: 0.5 }}>
+                {!msg.is_read && (
+                  <Tooltip title="Mark as read">
+                    <IconButton size="small" onClick={() => handleMarkRead(msg.id)} sx={{ color: '#10B981' }}>
+                      <MarkEmailReadIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                <Tooltip title="Delete">
+                  <IconButton size="small" onClick={() => handleDelete(msg.id)} sx={{ color: '#EF4444' }}>
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Box>
+            {msg.subject && (
+              <Typography variant="body2" fontWeight={600} color="#94A3B8" sx={{ mb: 0.5 }}>
+                Re: {msg.subject}
+              </Typography>
+            )}
+            <Divider sx={{ my: 1, borderColor: 'rgba(0,180,216,0.08)' }} />
+            <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-wrap' }}>
+              {msg.body}
+            </Typography>
+            <Typography variant="caption" color="text.disabled" sx={{ mt: 1, display: 'block' }}>
+              {new Date(msg.created_at).toLocaleString()}
+              {msg.allow_email && ' · Consented to email'}
+            </Typography>
+          </GlassCard>
+        ))}
+      </Box>
     </Box>
   )
 }

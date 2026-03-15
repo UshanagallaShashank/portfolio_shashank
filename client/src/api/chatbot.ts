@@ -1,7 +1,7 @@
 import apiClient from './client'
 
 export interface ChatMessage {
-  role: 'user' | 'assistant'
+  role: 'user' | 'model'
   content: string
   timestamp: string
 }
@@ -12,11 +12,8 @@ export interface ChatResponse {
   messages: ChatMessage[]
 }
 
-export const sendChatMessage = (payload: { session_id: string; message: string }) =>
-  apiClient.post<ChatResponse>('/api/chatbot/chat', payload).then((r) => r.data)
+export const sendChatMessage = (session_id: string, message: string) =>
+  apiClient.post<ChatResponse>('/api/chatbot/chat', { session_id, message }).then((r) => r.data)
 
-export const getChatSession = (sessionId: string) =>
-  apiClient.get<{ messages: ChatMessage[] }>(`/api/chatbot/session/${sessionId}`).then((r) => r.data)
-
-export const clearChatSession = (sessionId: string) =>
-  apiClient.delete(`/api/chatbot/session/${sessionId}`)
+export const clearChatSession = (session_id: string) =>
+  apiClient.delete(`/api/chatbot/chat/${session_id}`)

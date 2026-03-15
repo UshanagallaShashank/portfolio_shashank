@@ -1,102 +1,274 @@
-import { useState, useEffect } from 'react'
-import { Box, Typography, Button, CircularProgress, Alert, Table, TableBody, TableCell, TableHead, TableRow, Chip } from '@mui/material'
-import UploadFileIcon from '@mui/icons-material/UploadFile'
+import { useEffect, useRef, useState } from 'react'
+import {
+  Box, Typography, CircularProgress, Button, Chip,
+  Dialog, DialogTitle, DialogContent, DialogActions,
+} from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
-import { uploadResume, getResumeVersions, activateResume } from '../../api/admin'
+import UploadFileIcon from '@mui/icons-material/UploadFile'
+import DeleteIcon from '@mui/icons-material/Delete'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked'
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
 import GlassCard from '../../components/ui/GlassCard'
-
-interface ResumeVersion {
-  id: string
-  file_name: string
-  public_url: string
-  is_active: boolean
-  uploaded_at: string
-}
+import { fetchResumeVersions, activateResume, uploadResume, deleteResume } from '../../api/resume'
+import type { ResumeVersion } from '../../api/resume'
 
 export default function AdminResumeManager() {
   const [versions, setVersions] = useState<ResumeVersion[]>([])
+  const [loading, setLoading] = useState(true)
+  const [activating, setActivating] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
+  const [uploadError, setUploadError] = useState('')
+  const [dragging, setDragging] = useState(false)
+  const [deleteTarget, setDeleteTarget] = useState<ResumeVersion | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
 
-  const load = () => getResumeVersions().then(setVersions).catch(() => {})
+  const load = () =>
+    fetchResumeVersions()
+      .then(setVersions)
+      .finally(() => setLoading(false))
 
   useEffect(() => { load() }, [])
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setUploading(true); setError(''); setSuccess('')
+  const handleFile = async (file: File) => {
+    if (!file.name.toLowerCase().endsWith('.pdf')) {
+      setUploadError('Only PDF files are supported.')
+      return
+    }
+    setUploadError('')
+    setUploading(true)
     try {
-      await uploadResume(file)
-      setSuccess('Resume uploaded successfully!')
-      load()
+      const newVersion = await uploadResume(file)
+      setVersions((prev) => [newVersion, ...prev])
     } catch {
-      setError('Upload failed. Please try again.')
+      setUploadError('Upload failed. Make sure the "resumes" bucket exists in Supabase Storage.')
     } finally {
       setUploading(false)
-      e.target.value = ''
     }
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setDragging(false)
+    const file = e.dataTransfer.files[0]
+    if (file) handleFile(file)
   }
 
   const handleActivate = async (id: string) => {
+    setActivating(id)
     try {
       await activateResume(id)
-      setSuccess('Resume activated.')
-      load()
-    } catch {
-      setError('Failed to activate.')
+      setVersions((prev) => prev.map((v) => ({ ...v, is_active: v.id === id })))
+    } finally {
+      setActivating(null)
     }
   }
 
+  const handleDelete = async () => {
+    if (!deleteTarget) return
+    setDeleting(true)
+    try {
+      await deleteResume(deleteTarget.id)
+      setVersions((prev) => prev.filter((v) => v.id !== deleteTarget.id))
+      setDeleteTarget(null)
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const active = versions.find((v) => v.is_active)
+
+  if (loading) return (
+    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
+      <CircularProgress sx={{ color: '#00B4D8' }} />
+    </Box>
+  )
+
   return (
     <Box>
-      <Typography variant="h5" fontWeight={700} sx={{ color: '#E2E8F0', mb: 4 }}>Resume Manager</Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4, flexWrap: 'wrap', gap: 2 }}>
+        <Box>
+          <Typography variant="h4" fontWeight={800} color="#E2E8F0">Resume Manager</Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+            Upload PDF versions and control which one visitors can download.
+          </Typography>
+        </Box>
+        {active && (
+          <Chip
+            icon={<RadioButtonCheckedIcon sx={{ fontSize: '13px !important', color: '#10B981 !important' }} />}
+            label={`Live: ${active.file_name}`}
+            sx={{ bgcolor: 'rgba(16,185,129,0.12)', color: '#10B981', border: '1px solid rgba(16,185,129,0.3)', maxWidth: 280 }}
+          />
+        )}
+      </Box>
 
-      <GlassCard sx={{ p: 4, mb: 4, textAlign: 'center' }}>
-        <UploadFileIcon sx={{ fontSize: 48, color: '#00B4D8', mb: 2 }} />
-        <Typography sx={{ color: '#E2E8F0', mb: 1 }}>Upload New Resume</Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>PDF files only. The uploaded file will be available for download after activation.</Typography>
-        <Button variant="contained" component="label" disabled={uploading}
-          startIcon={uploading ? <CircularProgress size={18} color="inherit" /> : <UploadFileIcon />}
-          sx={{ background: 'linear-gradient(135deg, #00B4D8, #7C3AED)', fontWeight: 700 }}>
-          {uploading ? 'Uploading...' : 'Choose PDF'}
-          <input type="file" accept=".pdf" hidden onChange={handleUpload} />
-        </Button>
-        {error && <Alert severity="error" sx={{ mt: 2, background: 'rgba(239,68,68,0.1)' }}>{error}</Alert>}
-        {success && <Alert severity="success" sx={{ mt: 2, background: 'rgba(16,185,129,0.1)' }}>{success}</Alert>}
+      {/* Upload Zone */}
+      <GlassCard
+        hover={false}
+        onDragOver={(e: React.DragEvent) => { e.preventDefault(); setDragging(true) }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={handleDrop}
+        sx={{
+          p: 5, mb: 4, textAlign: 'center', cursor: uploading ? 'default' : 'pointer',
+          border: `2px dashed ${dragging ? '#00B4D8' : 'rgba(0,180,216,0.25)'}`,
+          background: dragging ? 'rgba(0,180,216,0.06)' : undefined,
+          transition: 'all 0.2s',
+          '&:hover': { borderColor: uploading ? undefined : 'rgba(0,180,216,0.55)' },
+        }}
+        onClick={() => !uploading && inputRef.current?.click()}
+      >
+        <input
+          ref={inputRef}
+          type="file"
+          accept=".pdf"
+          style={{ display: 'none' }}
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); e.target.value = '' }}
+        />
+        {uploading ? (
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+            <CircularProgress size={36} sx={{ color: '#00B4D8' }} />
+            <Typography color="text.secondary">Uploading to Supabase Storage...</Typography>
+          </Box>
+        ) : (
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5 }}>
+            <Box sx={{
+              width: 56, height: 56, borderRadius: '50%',
+              background: 'linear-gradient(135deg, rgba(0,180,216,0.2), rgba(124,58,237,0.2))',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <UploadFileIcon sx={{ color: '#00B4D8', fontSize: 28 }} />
+            </Box>
+            <Typography fontWeight={600} color="#E2E8F0">
+              {dragging ? 'Drop PDF here' : 'Click to upload or drag & drop'}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">PDF only · Max 10 MB</Typography>
+          </Box>
+        )}
+        {uploadError && (
+          <Typography variant="caption" sx={{ color: '#EF4444', display: 'block', mt: 2 }}>{uploadError}</Typography>
+        )}
       </GlassCard>
 
-      <GlassCard sx={{ p: 3 }}>
-        <Typography variant="h6" fontWeight={600} sx={{ color: '#E2E8F0', mb: 2 }}>Version History</Typography>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ color: '#64748B', borderBottom: '1px solid rgba(0,180,216,0.15)' }}>File</TableCell>
-              <TableCell sx={{ color: '#64748B', borderBottom: '1px solid rgba(0,180,216,0.15)' }}>Uploaded</TableCell>
-              <TableCell sx={{ color: '#64748B', borderBottom: '1px solid rgba(0,180,216,0.15)' }}>Status</TableCell>
-              <TableCell sx={{ color: '#64748B', borderBottom: '1px solid rgba(0,180,216,0.15)' }}>Action</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {versions.map((v) => (
-              <TableRow key={v.id}>
-                <TableCell sx={{ color: '#E2E8F0', borderBottom: '1px solid rgba(0,180,216,0.08)', fontSize: '0.8rem' }}>{v.file_name}</TableCell>
-                <TableCell sx={{ color: '#94A3B8', borderBottom: '1px solid rgba(0,180,216,0.08)', fontSize: '0.8rem' }}>{new Date(v.uploaded_at).toLocaleDateString()}</TableCell>
-                <TableCell sx={{ borderBottom: '1px solid rgba(0,180,216,0.08)' }}>
-                  {v.is_active ? <Chip label="Active" size="small" icon={<CheckCircleIcon />} sx={{ background: 'rgba(16,185,129,0.15)', color: '#10B981' }} /> : <Chip label="Inactive" size="small" sx={{ background: 'rgba(100,116,139,0.15)', color: '#64748B' }} />}
-                </TableCell>
-                <TableCell sx={{ borderBottom: '1px solid rgba(0,180,216,0.08)' }}>
-                  {!v.is_active && <Button size="small" onClick={() => handleActivate(v.id)} sx={{ color: '#00B4D8', textTransform: 'none', fontSize: '0.75rem' }}>Set Active</Button>}
-                </TableCell>
-              </TableRow>
-            ))}
-            {versions.length === 0 && (
-              <TableRow><TableCell colSpan={4} sx={{ color: '#64748B', textAlign: 'center', py: 4 }}>No resume versions uploaded yet.</TableCell></TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </GlassCard>
+      {/* Versions List */}
+      {versions.length === 0 ? (
+        <Box sx={{ textAlign: 'center', py: 8 }}>
+          <PictureAsPdfIcon sx={{ fontSize: 52, color: 'rgba(100,116,139,0.3)', mb: 2 }} />
+          <Typography color="text.secondary">No resume versions yet. Upload your first PDF above.</Typography>
+        </Box>
+      ) : (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+          <Typography variant="overline" color="text.secondary" sx={{ letterSpacing: 2, fontSize: 11 }}>
+            {versions.length} version{versions.length !== 1 ? 's' : ''}
+          </Typography>
+          {versions.map((v) => (
+            <GlassCard
+              key={v.id}
+              hover={false}
+              sx={{
+                p: 2.5,
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                border: v.is_active ? '1px solid rgba(16,185,129,0.4)' : '1px solid rgba(255,255,255,0.05)',
+                background: v.is_active ? 'rgba(16,185,129,0.04)' : 'rgba(255,255,255,0.02)',
+              }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, overflow: 'hidden', flex: 1 }}>
+                <Box sx={{
+                  width: 40, height: 40, flexShrink: 0, borderRadius: 2,
+                  background: v.is_active ? 'rgba(16,185,129,0.15)' : 'rgba(0,180,216,0.1)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <PictureAsPdfIcon sx={{ color: v.is_active ? '#10B981' : '#00B4D8', fontSize: 20 }} />
+                </Box>
+                <Box sx={{ overflow: 'hidden', flex: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                    <Typography fontWeight={600} color="#E2E8F0" noWrap sx={{ maxWidth: { xs: 140, md: 320 } }}>
+                      {v.file_name}
+                    </Typography>
+                    {v.is_active && (
+                      <Chip
+                        icon={<CheckCircleIcon sx={{ fontSize: '12px !important' }} />}
+                        label="Live"
+                        size="small"
+                        sx={{ bgcolor: 'rgba(16,185,129,0.15)', color: '#10B981', height: 20, fontSize: 11 }}
+                      />
+                    )}
+                  </Box>
+                  <Typography variant="caption" color="text.secondary">
+                    {new Date(v.uploaded_at).toLocaleString()}
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Box sx={{ display: 'flex', gap: 1, flexShrink: 0, ml: 2 }}>
+                <Button
+                  component="a" href={v.public_url} target="_blank"
+                  size="small" endIcon={<OpenInNewIcon sx={{ fontSize: '13px !important' }} />}
+                  sx={{ color: '#64748B', textTransform: 'none', fontSize: 13, minWidth: 0 }}
+                >
+                  View
+                </Button>
+                {!v.is_active && (
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    disabled={!!activating}
+                    onClick={() => handleActivate(v.id)}
+                    sx={{
+                      borderColor: 'rgba(0,180,216,0.4)', color: '#00B4D8',
+                      textTransform: 'none', fontSize: 13, whiteSpace: 'nowrap',
+                      '&:hover': { borderColor: '#00B4D8', background: 'rgba(0,180,216,0.08)' },
+                    }}
+                  >
+                    {activating === v.id ? <CircularProgress size={14} color="inherit" /> : 'Set Live'}
+                  </Button>
+                )}
+                <Button
+                  size="small"
+                  onClick={() => setDeleteTarget(v)}
+                  sx={{ minWidth: 36, color: '#EF4444', '&:hover': { background: 'rgba(239,68,68,0.08)' } }}
+                >
+                  <DeleteIcon sx={{ fontSize: 18 }} />
+                </Button>
+              </Box>
+            </GlassCard>
+          ))}
+        </Box>
+      )}
+
+      {/* Delete Confirmation */}
+      <Dialog
+        open={!!deleteTarget}
+        onClose={() => !deleting && setDeleteTarget(null)}
+        PaperProps={{ sx: { bgcolor: '#0E1426', border: '1px solid rgba(0,180,216,0.15)', borderRadius: 3, minWidth: 360 } }}
+      >
+        <DialogTitle sx={{ color: '#E2E8F0', fontWeight: 700 }}>Delete Resume Version?</DialogTitle>
+        <DialogContent>
+          <Typography color="text.secondary" sx={{ lineHeight: 1.7 }}>
+            This will permanently delete{' '}
+            <strong style={{ color: '#E2E8F0' }}>{deleteTarget?.file_name}</strong>{' '}
+            from storage. This cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3, gap: 1 }}>
+          <Button
+            onClick={() => setDeleteTarget(null)}
+            disabled={deleting}
+            sx={{ color: '#64748B', textTransform: 'none' }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDelete}
+            disabled={deleting}
+            variant="contained"
+            startIcon={deleting ? <CircularProgress size={16} color="inherit" /> : <DeleteIcon />}
+            sx={{ background: '#EF4444', textTransform: 'none', fontWeight: 700, '&:hover': { background: '#DC2626' } }}
+          >
+            {deleting ? 'Deleting...' : 'Delete'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }
