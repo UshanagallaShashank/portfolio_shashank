@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import {
   Box, Typography, CircularProgress, IconButton, Tooltip, Button,
   Dialog, DialogTitle, DialogContent, DialogActions, TextField,
-  Switch, FormControlLabel, Chip, Slider,
+  Switch, FormControlLabel, Chip, Slider, Snackbar, Alert,
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -15,6 +15,7 @@ import GlassCard from '../../components/ui/GlassCard'
 import { fetchAllSkills, toggleSkillVisibility } from '../../api/skills'
 import type { Skill } from '../../api/skills'
 import apiClient from '../../api/client'
+import { invalidateCache } from '../../hooks/useApiCache'
 
 interface SkillForm {
   name: string
@@ -38,6 +39,7 @@ export default function AdminSkillsManager() {
   const [saving, setSaving] = useState(false)
   const [visibilityTarget, setVisibilityTarget] = useState<Skill | null>(null)
   const [toggling, setToggling] = useState(false)
+  const [snack, setSnack] = useState<{ msg: string; severity: 'success' | 'error' } | null>(null)
 
   const load = () => fetchAllSkills().then(setSkills).finally(() => setLoading(false))
   useEffect(() => { load() }, [])
@@ -62,7 +64,11 @@ export default function AdminSkillsManager() {
         await apiClient.post('/api/skills', payload)
       }
       setDialogOpen(false)
+      invalidateCache('skills')
+      setSnack({ msg: 'Saved!', severity: 'success' })
       load()
+    } catch {
+      setSnack({ msg: 'Save failed. Ensure Supabase grants are applied (see schema SQL).', severity: 'error' })
     } finally {
       setSaving(false)
     }
@@ -73,6 +79,7 @@ export default function AdminSkillsManager() {
     setToggling(true)
     try {
       await toggleSkillVisibility(visibilityTarget.id, !visibilityTarget.is_visible)
+      invalidateCache('skills')
       setSkills((prev) => prev.map((x) =>
         x.id === visibilityTarget.id ? { ...x, is_visible: !visibilityTarget.is_visible } : x
       ))
@@ -84,8 +91,14 @@ export default function AdminSkillsManager() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this skill?')) return
-    await apiClient.delete(`/api/skills/${id}`)
-    setSkills((prev) => prev.filter((s) => s.id !== id))
+    try {
+      await apiClient.delete(`/api/skills/${id}`)
+      invalidateCache('skills')
+      setSkills((prev) => prev.filter((s) => s.id !== id))
+      setSnack({ msg: 'Deleted.', severity: 'success' })
+    } catch {
+      setSnack({ msg: 'Delete failed.', severity: 'error' })
+    }
   }
 
   const categories = Array.from(new Set(skills.map((s) => s.category ?? 'Uncategorized')))
@@ -263,6 +276,13 @@ export default function AdminSkillsManager() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar open={!!snack} autoHideDuration={4000} onClose={() => setSnack(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+        <Alert onClose={() => setSnack(null)} severity={snack?.severity ?? 'info'} sx={{ width: '100%' }}>
+          {snack?.msg}
+        </Alert>
+      </Snackbar>
     </Box>
   )
 }

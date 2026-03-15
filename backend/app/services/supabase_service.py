@@ -21,8 +21,8 @@ class SupabaseService:
         return res.data or []
 
     def get_project(self, project_id: str) -> Optional[Dict]:
-        res = self.db.table("projects").select("*").eq("id", project_id).maybe_single().execute()
-        return res.data
+        res = self.db.table("projects").select("*").eq("id", project_id).limit(1).execute()
+        return res.data[0] if res.data else None
 
     def create_project(self, data: Dict) -> Dict:
         res = self.db.table("projects").insert(data).execute()
@@ -77,16 +77,16 @@ class SupabaseService:
         return res.data or []
 
     def get_active_resume(self) -> Optional[Dict]:
-        res = self.db.table("resume_versions").select("*").eq("is_active", True).maybe_single().execute()
-        return res.data
+        res = self.db.table("resume_versions").select("*").eq("is_active", True).limit(1).execute()
+        return res.data[0] if res.data else None
 
     def create_resume_version(self, data: Dict) -> Dict:
         res = self.db.table("resume_versions").insert(data).execute()
         return res.data[0]
 
     def get_resume_version(self, resume_id: str) -> Optional[Dict]:
-        res = self.db.table("resume_versions").select("*").eq("id", resume_id).maybe_single().execute()
-        return res.data
+        res = self.db.table("resume_versions").select("*").eq("id", resume_id).limit(1).execute()
+        return res.data[0] if res.data else None
 
     def delete_resume_version(self, resume_id: str) -> None:
         self.db.table("resume_versions").delete().eq("id", resume_id).execute()
@@ -116,10 +116,50 @@ class SupabaseService:
     def delete_stat(self, stat_id: str) -> None:
         self.db.table("stats").delete().eq("id", stat_id).execute()
 
+    # Achievements
+    def get_achievements(self) -> List[Dict]:
+        res = self.db.table("achievements").select("*").eq("is_visible", True).order("display_order").execute()
+        return res.data or []
+
+    def get_all_achievements(self) -> List[Dict]:
+        res = self.db.table("achievements").select("*").order("display_order").execute()
+        return res.data or []
+
+    def create_achievement(self, data: Dict) -> Dict:
+        res = self.db.table("achievements").insert(data).execute()
+        return res.data[0]
+
+    def update_achievement(self, item_id: str, data: Dict) -> Dict:
+        res = self.db.table("achievements").update(data).eq("id", item_id).execute()
+        return res.data[0]
+
+    def delete_achievement(self, item_id: str) -> None:
+        self.db.table("achievements").delete().eq("id", item_id).execute()
+
+    # Certifications
+    def get_certifications(self) -> List[Dict]:
+        res = self.db.table("certifications").select("*").eq("is_visible", True).order("display_order").execute()
+        return res.data or []
+
+    def get_all_certifications(self) -> List[Dict]:
+        res = self.db.table("certifications").select("*").order("display_order").execute()
+        return res.data or []
+
+    def create_certification(self, data: Dict) -> Dict:
+        res = self.db.table("certifications").insert(data).execute()
+        return res.data[0]
+
+    def update_certification(self, item_id: str, data: Dict) -> Dict:
+        res = self.db.table("certifications").update(data).eq("id", item_id).execute()
+        return res.data[0]
+
+    def delete_certification(self, item_id: str) -> None:
+        self.db.table("certifications").delete().eq("id", item_id).execute()
+
     # Chatbot sessions
     def get_chat_session(self, session_id: str) -> Optional[Dict]:
-        res = self.db.table("chatbot_sessions").select("*").eq("session_id", session_id).maybe_single().execute()
-        return res.data
+        res = self.db.table("chatbot_sessions").select("*").eq("session_id", session_id).limit(1).execute()
+        return res.data[0] if res.data else None
 
     def upsert_chat_session(self, session_id: str, messages: List[Dict], ip: Optional[str] = None) -> Dict:
         res = self.db.table("chatbot_sessions").upsert({

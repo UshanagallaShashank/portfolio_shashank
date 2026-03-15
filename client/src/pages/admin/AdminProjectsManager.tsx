@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import {
   Box, Typography, CircularProgress, IconButton, Tooltip, Button,
   Dialog, DialogTitle, DialogContent, DialogActions, TextField,
-  Switch, FormControlLabel, Chip,
+  Switch, FormControlLabel, Chip, Snackbar, Alert,
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -15,6 +15,7 @@ import GlassCard from '../../components/ui/GlassCard'
 import { fetchAllProjects, toggleProjectVisibility } from '../../api/projects'
 import type { Project } from '../../api/projects'
 import apiClient from '../../api/client'
+import { invalidateCache } from '../../hooks/useApiCache'
 
 interface ProjectForm {
   title: string
@@ -42,6 +43,7 @@ export default function AdminProjectsManager() {
   const [saving, setSaving] = useState(false)
   const [visibilityTarget, setVisibilityTarget] = useState<Project | null>(null)
   const [toggling, setToggling] = useState(false)
+  const [snack, setSnack] = useState<{ msg: string; severity: 'success' | 'error' } | null>(null)
 
   const load = () => fetchAllProjects().then(setProjects).finally(() => setLoading(false))
   useEffect(() => { load() }, [])
@@ -68,7 +70,11 @@ export default function AdminProjectsManager() {
         await apiClient.post('/api/projects', payload)
       }
       setDialogOpen(false)
+      invalidateCache('projects')
+      setSnack({ msg: 'Saved!', severity: 'success' })
       load()
+    } catch {
+      setSnack({ msg: 'Save failed. Ensure Supabase grants are applied (see schema SQL).', severity: 'error' })
     } finally {
       setSaving(false)
     }
@@ -79,6 +85,7 @@ export default function AdminProjectsManager() {
     setToggling(true)
     try {
       await toggleProjectVisibility(visibilityTarget.id, !visibilityTarget.is_visible)
+      invalidateCache('projects')
       setProjects((prev) => prev.map((x) =>
         x.id === visibilityTarget.id ? { ...x, is_visible: !visibilityTarget.is_visible } : x
       ))
@@ -90,8 +97,14 @@ export default function AdminProjectsManager() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this project?')) return
-    await apiClient.delete(`/api/projects/${id}`)
-    setProjects((prev) => prev.filter((p) => p.id !== id))
+    try {
+      await apiClient.delete(`/api/projects/${id}`)
+      invalidateCache('projects')
+      setProjects((prev) => prev.filter((p) => p.id !== id))
+      setSnack({ msg: 'Deleted.', severity: 'success' })
+    } catch {
+      setSnack({ msg: 'Delete failed.', severity: 'error' })
+    }
   }
 
   if (loading) return (
@@ -249,6 +262,13 @@ export default function AdminProjectsManager() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar open={!!snack} autoHideDuration={4000} onClose={() => setSnack(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+        <Alert onClose={() => setSnack(null)} severity={snack?.severity ?? 'info'} sx={{ width: '100%' }}>
+          {snack?.msg}
+        </Alert>
+      </Snackbar>
     </Box>
   )
 }

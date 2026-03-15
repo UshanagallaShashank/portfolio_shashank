@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import {
   Box, Typography, CircularProgress, IconButton, Tooltip, Button,
   Dialog, DialogTitle, DialogContent, DialogActions, TextField,
-  Switch, FormControlLabel, Chip,
+  Switch, FormControlLabel, Chip, Snackbar, Alert,
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -14,6 +14,7 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import GlassCard from '../../components/ui/GlassCard'
 import type { Stat } from '../../api/stats'
 import apiClient from '../../api/client'
+import { invalidateCache } from '../../hooks/useApiCache'
 
 interface StatForm {
   label: string
@@ -33,6 +34,7 @@ export default function AdminStatsManager() {
   const [saving, setSaving] = useState(false)
   const [visibilityTarget, setVisibilityTarget] = useState<Stat | null>(null)
   const [toggling, setToggling] = useState(false)
+  const [snack, setSnack] = useState<{ msg: string; severity: 'success' | 'error' } | null>(null)
 
   const load = () =>
     apiClient.get<Stat[]>('/api/stats/all').then((r) => setStats(r.data)).finally(() => setLoading(false))
@@ -55,7 +57,11 @@ export default function AdminStatsManager() {
         await apiClient.post('/api/stats', form)
       }
       setDialogOpen(false)
+      invalidateCache('stats')
+      setSnack({ msg: 'Saved!', severity: 'success' })
       load()
+    } catch {
+      setSnack({ msg: 'Save failed. Ensure Supabase grants are applied (see schema SQL).', severity: 'error' })
     } finally {
       setSaving(false)
     }
@@ -66,6 +72,7 @@ export default function AdminStatsManager() {
     setToggling(true)
     try {
       await apiClient.patch(`/api/stats/${visibilityTarget.id}`, { is_visible: !visibilityTarget.is_visible })
+      invalidateCache('stats')
       setStats((prev) => prev.map((x) =>
         x.id === visibilityTarget.id ? { ...x, is_visible: !visibilityTarget.is_visible } : x
       ))
@@ -77,8 +84,14 @@ export default function AdminStatsManager() {
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this stat?')) return
-    await apiClient.delete(`/api/stats/${id}`)
-    setStats((prev) => prev.filter((s) => s.id !== id))
+    try {
+      await apiClient.delete(`/api/stats/${id}`)
+      invalidateCache('stats')
+      setStats((prev) => prev.filter((s) => s.id !== id))
+      setSnack({ msg: 'Deleted.', severity: 'success' })
+    } catch {
+      setSnack({ msg: 'Delete failed.', severity: 'error' })
+    }
   }
 
   if (loading) return (
@@ -231,6 +244,13 @@ export default function AdminStatsManager() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar open={!!snack} autoHideDuration={4000} onClose={() => setSnack(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+        <Alert onClose={() => setSnack(null)} severity={snack?.severity ?? 'info'} sx={{ width: '100%' }}>
+          {snack?.msg}
+        </Alert>
+      </Snackbar>
     </Box>
   )
 }

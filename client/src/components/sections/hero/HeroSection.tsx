@@ -3,12 +3,17 @@ import { motion } from 'framer-motion'
 import DownloadIcon from '@mui/icons-material/Download'
 import ChatIcon from '@mui/icons-material/Chat'
 import GitHubIcon from '@mui/icons-material/GitHub'
+import { useApiCache } from '../../../hooks/useApiCache'
+import { fetchStats } from '../../../api/stats'
+import type { Stat } from '../../../api/stats'
 import LinkedInIcon from '@mui/icons-material/LinkedIn'
 import TypewriterText from '../../ui/TypewriterText'
 import { PERSONAL } from '../../../constants/personal'
 import { staggerContainer, fadeInLeft, fadeInRight, fadeInUp } from '../../../utils/animationVariants'
 
 export default function HeroSection() {
+  const { data: stats } = useApiCache<Stat[]>('stats', fetchStats)
+
   const handleDownload = () => {
     window.open(
       `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'}${PERSONAL.resumeDownloadPath}`,
@@ -255,12 +260,7 @@ export default function HeroSection() {
             flexWrap: 'wrap', justifyContent: { xs: 'center', md: 'flex-start' },
           }}
         >
-          {[
-            { value: '350+', label: 'Problems Solved' },
-            { value: 'Top 9.5%', label: 'LeetCode Global' },
-            { value: '1+', label: 'Years at RealPage' },
-            { value: '4★', label: 'CodeChef Rating' },
-          ].map((stat) => (
+          {(stats ?? []).map((stat) => (
             <Box key={stat.label} sx={{ textAlign: 'center' }}>
               <Typography sx={{
                 fontSize: { xs: '1.4rem', md: '1.8rem' },

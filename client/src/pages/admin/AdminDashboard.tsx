@@ -10,6 +10,7 @@ import FolderIcon from '@mui/icons-material/Folder'
 import DescriptionIcon from '@mui/icons-material/Description'
 import CodeIcon from '@mui/icons-material/Code'
 import BarChartIcon from '@mui/icons-material/BarChart'
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
 import LogoutIcon from '@mui/icons-material/Logout'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import { useAuth } from '../../hooks/useAuth'
@@ -21,6 +22,7 @@ import AdminProjectsManager from './AdminProjectsManager'
 import AdminSkillsManager from './AdminSkillsManager'
 import AdminStatsManager from './AdminStatsManager'
 import AdminResumeManager from './AdminResumeManager'
+import AdminAchievementsManager from './AdminAchievementsManager'
 
 const DRAWER_WIDTH = 240
 
@@ -90,6 +92,7 @@ export default function AdminDashboard() {
     { label: 'Projects', path: '/admin/projects', icon: <FolderIcon fontSize="small" /> },
     { label: 'Skills', path: '/admin/skills', icon: <CodeIcon fontSize="small" /> },
     { label: 'Stats', path: '/admin/stats', icon: <BarChartIcon fontSize="small" /> },
+    { label: 'Achievements', path: '/admin/achievements', icon: <EmojiEventsIcon fontSize="small" /> },
     { label: 'Resume', path: '/admin/resume', icon: <DescriptionIcon fontSize="small" /> },
   ]
 
@@ -223,6 +226,7 @@ export default function AdminDashboard() {
           <Route path="projects" element={<AdminProjectsManager />} />
           <Route path="skills" element={<AdminSkillsManager />} />
           <Route path="stats" element={<AdminStatsManager />} />
+          <Route path="achievements" element={<AdminAchievementsManager />} />
           <Route path="resume" element={<AdminResumeManager />} />
         </Routes>
       </Box>
