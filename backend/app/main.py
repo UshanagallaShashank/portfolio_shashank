@@ -30,6 +30,14 @@ def create_app() -> FastAPI:
     app.state.limiter = limiter
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+    @app.exception_handler(Exception)
+    async def _unhandled(_req: Request, exc: Exception):
+        return JSONResponse(
+            status_code=500,
+            content={"detail": str(exc)},
+            headers={"Access-Control-Allow-Origin": "*"},
+        )
+
     origins = [o.strip() for o in settings.frontend_origin.split(",") if o.strip()]
     app.add_middleware(
         CORSMiddleware,
