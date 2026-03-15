@@ -9,7 +9,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import SendIcon from '@mui/icons-material/Send'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import ChatMessage from './ChatMessage'
-import { sendChatMessage, clearChatSession, ChatMessage as IChatMessage } from '../../api/chatbot'
+import { sendChatMessage, clearChatSession, type ChatMessage as IChatMessage } from '../../api/chatbot'
 
 const SESSION_KEY = 'chatbot_session_id'
 
@@ -52,7 +52,7 @@ export default function ChatbotWidget() {
     setLoading(true)
 
     try {
-      const res = await sendChatMessage({ session_id: sessionId.current, message: text })
+      const res = await sendChatMessage(sessionId.current, text)
       const botMsg: IChatMessage = {
         role: 'assistant',
         content: res.reply,

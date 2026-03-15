@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { Box } from '@mui/material'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 const pageVariants = {
   initial: { opacity: 0, y: 20 },

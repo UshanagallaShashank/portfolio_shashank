@@ -1,7 +1,7 @@
 import apiClient from './client'
 
 export interface ChatMessage {
-  role: 'user' | 'model'
+  role: 'user' | 'assistant'
   content: string
   timestamp: string
 }
