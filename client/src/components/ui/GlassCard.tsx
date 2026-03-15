@@ -3,6 +3,9 @@ import { motion } from 'framer-motion'
 import { useTheme } from '../../context/ThemeContext'
 import type { ComponentProps } from 'react'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const MotionBox = motion(Box as any)
+
 interface Props extends Omit<ComponentProps<typeof Box>, 'component'> {
   hover?: boolean
   glow?: boolean
@@ -12,8 +15,7 @@ export default function GlassCard({ children, hover = true, glow = false, sx, ..
   const { isDark } = useTheme()
 
   return (
-    <Box
-      component={motion.div}
+    <MotionBox
       whileHover={hover ? { y: -4, scale: 1.01 } : undefined}
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       sx={{
@@ -36,6 +38,6 @@ export default function GlassCard({ children, hover = true, glow = false, sx, ..
       {...rest}
     >
       {children}
-    </Box>
+    </MotionBox>
   )
 }

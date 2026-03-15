@@ -1,11 +1,9 @@
 import { TypeAnimation } from 'react-type-animation'
 import { Box } from '@mui/material'
 
-import type { Speed } from 'react-type-animation'
-
 interface Props {
   sequences: string[]
-  speed?: Speed
+  speed?: number
   fontSize?: string | object
 }
 
@@ -31,7 +29,8 @@ export default function TypewriterText({ sequences, speed = 50, fontSize = '1.5r
     >
       <TypeAnimation
         sequence={seq}
-        speed={speed}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        speed={speed as any}
         repeat={Infinity}
         style={{ display: 'inline-block' }}
       />
