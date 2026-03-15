@@ -4,7 +4,8 @@ import { motion } from 'framer-motion'
 import SectionTitle from '../components/ui/SectionTitle'
 import ProjectCard from '../components/sections/projects/ProjectCard'
 import PageWrapper from '../components/layout/PageWrapper'
-import { fetchGitHubRepos, fetchFeaturedProjects, GitHubRepo, Project } from '../api/projects'
+import { fetchGitHubRepos, fetchFeaturedProjects } from '../api/projects'
+import type { GitHubRepo, Project } from '../api/projects'
 import { FEATURED_PROJECTS } from '../constants/personal'
 import { staggerContainer, fadeInUp } from '../utils/animationVariants'
 
@@ -62,7 +63,7 @@ export default function ProjectsPage() {
           >
             <Grid container spacing={3}>
               {displayFeatured.map((p, i) => (
-                <Grid item xs={12} md={6} lg={4} key={i}>
+                <Grid size={{ xs: 12, md: 6, lg: 4 }} key={i}>
                   <motion.div variants={fadeInUp}>
                     <ProjectCard
                       title={p.title || (p as any).title}
@@ -91,7 +92,7 @@ export default function ProjectsPage() {
             ) : (
               <Grid container spacing={3}>
                 {githubRepos.map((repo, i) => (
-                  <Grid item xs={12} md={6} lg={4} key={i}>
+                  <Grid size={{ xs: 12, md: 6, lg: 4 }} key={i}>
                     <motion.div variants={fadeInUp}>
                       <ProjectCard
                         title={repo.name}

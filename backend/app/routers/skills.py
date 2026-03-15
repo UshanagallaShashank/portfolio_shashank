@@ -12,6 +12,12 @@ async def get_skills():
     return svc.get_skills()
 
 
+@router.get("/all", dependencies=[Depends(require_admin)])
+async def get_all_skills():
+    svc = get_supabase_service()
+    return svc.get_all_skills()
+
+
 @router.post("", dependencies=[Depends(require_admin)], status_code=201)
 async def create_skill(body: SkillCreate):
     svc = get_supabase_service()

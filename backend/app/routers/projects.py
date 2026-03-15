@@ -13,6 +13,12 @@ async def get_projects():
     return svc.get_projects()
 
 
+@router.get("/all", dependencies=[Depends(require_admin)])
+async def get_all_projects():
+    svc = get_supabase_service()
+    return svc.get_all_projects()
+
+
 @router.get("/featured")
 async def get_featured_projects():
     svc = get_supabase_service()

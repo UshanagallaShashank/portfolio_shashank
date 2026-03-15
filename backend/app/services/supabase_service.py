@@ -9,11 +9,15 @@ class SupabaseService:
 
     # Projects
     def get_projects(self) -> List[Dict]:
+        res = self.db.table("projects").select("*").eq("is_visible", True).order("display_order").execute()
+        return res.data or []
+
+    def get_all_projects(self) -> List[Dict]:
         res = self.db.table("projects").select("*").order("display_order").execute()
         return res.data or []
 
     def get_featured_projects(self) -> List[Dict]:
-        res = self.db.table("projects").select("*").eq("is_featured", True).order("display_order").execute()
+        res = self.db.table("projects").select("*").eq("is_featured", True).eq("is_visible", True).order("display_order").execute()
         return res.data or []
 
     def get_project(self, project_id: str) -> Optional[Dict]:
@@ -33,6 +37,10 @@ class SupabaseService:
 
     # Skills
     def get_skills(self) -> List[Dict]:
+        res = self.db.table("skills").select("*").eq("is_visible", True).order("display_order").execute()
+        return res.data or []
+
+    def get_all_skills(self) -> List[Dict]:
         res = self.db.table("skills").select("*").order("display_order").execute()
         return res.data or []
 
@@ -87,6 +95,26 @@ class SupabaseService:
         self.db.table("resume_versions").update({"is_active": False}).neq("id", resume_id).execute()
         res = self.db.table("resume_versions").update({"is_active": True}).eq("id", resume_id).execute()
         return res.data[0]
+
+    # Stats (homepage highlights)
+    def get_stats(self) -> List[Dict]:
+        res = self.db.table("stats").select("*").eq("is_visible", True).order("display_order").execute()
+        return res.data or []
+
+    def get_all_stats(self) -> List[Dict]:
+        res = self.db.table("stats").select("*").order("display_order").execute()
+        return res.data or []
+
+    def create_stat(self, data: Dict) -> Dict:
+        res = self.db.table("stats").insert(data).execute()
+        return res.data[0]
+
+    def update_stat(self, stat_id: str, data: Dict) -> Dict:
+        res = self.db.table("stats").update(data).eq("id", stat_id).execute()
+        return res.data[0]
+
+    def delete_stat(self, stat_id: str) -> None:
+        self.db.table("stats").delete().eq("id", stat_id).execute()
 
     # Chatbot sessions
     def get_chat_session(self, session_id: str) -> Optional[Dict]:

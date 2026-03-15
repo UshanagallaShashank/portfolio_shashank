@@ -64,7 +64,7 @@ export default function AchievementsPage() {
         </Box>
         <Grid container spacing={3}>
           {CERTIFICATIONS.map((cert, i) => (
-            <Grid item xs={12} sm={6} md={4} key={i}>
+            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={i}>
               <motion.div
                 variants={fadeInUp}
                 initial="hidden"

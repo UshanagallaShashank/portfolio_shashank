@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom'
 import { Suspense, lazy } from 'react'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
@@ -16,20 +16,31 @@ const ContactPage = lazy(() => import('../pages/ContactPage'))
 const AdminLoginPage = lazy(() => import('../pages/admin/AdminLoginPage'))
 const AdminDashboard = lazy(() => import('../pages/admin/AdminDashboard'))
 
+function PublicLayout() {
+  return (
+    <>
+      <Navbar />
+      <Outlet />
+      <Footer />
+    </>
+  )
+}
+
 export default function AppRouter() {
   return (
     <BrowserRouter>
       <ScrollToTop />
-      <Navbar />
       <Suspense fallback={<LoadingSpinner />}>
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/experience" element={<ExperiencePage />} />
-          <Route path="/projects" element={<ProjectsPage />} />
-          <Route path="/achievements" element={<AchievementsPage />} />
-          <Route path="/collaboration" element={<CollaborationPage />} />
-          <Route path="/contact" element={<ContactPage />} />
+          <Route element={<PublicLayout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/experience" element={<ExperiencePage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/achievements" element={<AchievementsPage />} />
+            <Route path="/collaboration" element={<CollaborationPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+          </Route>
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route
             path="/admin/*"
@@ -41,7 +52,6 @@ export default function AppRouter() {
           />
         </Routes>
       </Suspense>
-      <Footer />
     </BrowserRouter>
   )
 }

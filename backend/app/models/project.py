@@ -14,6 +14,7 @@ class ProjectBase(BaseModel):
     is_github_repo: bool = False
     github_repo_name: Optional[str] = None
     display_order: int = 0
+    is_visible: bool = True
 
 
 class ProjectCreate(ProjectBase):
@@ -29,6 +30,7 @@ class ProjectUpdate(BaseModel):
     thumbnail_url: Optional[str] = None
     is_featured: Optional[bool] = None
     display_order: Optional[int] = None
+    is_visible: Optional[bool] = None
 
 
 class Project(ProjectBase):

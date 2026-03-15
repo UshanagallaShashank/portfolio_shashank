@@ -7,7 +7,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
 from app.config import get_settings
-from app.routers import health, projects, skills, messages, resume, github, chatbot, admin
+from app.routers import health, projects, skills, messages, resume, github, chatbot, admin, stats
 
 
 @asynccontextmanager
@@ -46,6 +46,7 @@ def create_app() -> FastAPI:
     app.include_router(github.router, prefix="/api/github", tags=["github"])
     app.include_router(chatbot.router, prefix="/api/chatbot", tags=["chatbot"])
     app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
+    app.include_router(stats.router, prefix="/api/stats", tags=["stats"])
 
     return app
 

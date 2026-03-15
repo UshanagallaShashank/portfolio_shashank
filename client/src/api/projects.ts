@@ -12,6 +12,7 @@ export interface Project {
   is_github_repo: boolean
   github_repo_name?: string
   display_order: number
+  is_visible: boolean
 }
 
 export interface GitHubRepo {
@@ -31,6 +32,12 @@ export const fetchFeaturedProjects = () =>
 
 export const fetchProjects = () =>
   apiClient.get<Project[]>('/api/projects').then((r) => r.data)
+
+export const fetchAllProjects = () =>
+  apiClient.get<Project[]>('/api/projects/all').then((r) => r.data)
+
+export const toggleProjectVisibility = (id: string, is_visible: boolean) =>
+  apiClient.patch(`/api/projects/${id}`, { is_visible }).then((r) => r.data)
 
 export const fetchGitHubRepos = () =>
   apiClient.get<GitHubRepo[]>('/api/github/repos').then((r) => r.data)

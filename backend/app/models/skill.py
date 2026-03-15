@@ -8,6 +8,7 @@ class SkillBase(BaseModel):
     icon_url: Optional[str] = None
     proficiency: int = 80
     display_order: int = 0
+    is_visible: bool = True
 
 
 class SkillCreate(SkillBase):
@@ -19,6 +20,7 @@ class SkillUpdate(BaseModel):
     category: Optional[str] = None
     proficiency: Optional[int] = None
     display_order: Optional[int] = None
+    is_visible: Optional[bool] = None
 
 
 class Skill(SkillBase):
