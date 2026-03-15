@@ -1,4 +1,5 @@
-import { Chip, ChipProps } from '@mui/material'
+import { Chip } from '@mui/material'
+import type { ChipProps } from '@mui/material'
 import { motion } from 'framer-motion'
 
 interface Props extends ChipProps {

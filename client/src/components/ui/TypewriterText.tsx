@@ -1,9 +1,11 @@
 import { TypeAnimation } from 'react-type-animation'
 import { Box } from '@mui/material'
 
+import type { Speed } from 'react-type-animation'
+
 interface Props {
   sequences: string[]
-  speed?: number
+  speed?: Speed
   fontSize?: string | object
 }
 
