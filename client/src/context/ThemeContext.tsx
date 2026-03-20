@@ -28,9 +28,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     localStorage.setItem('theme', mode)
     document.documentElement.setAttribute('data-theme', mode)
-    // Set both html and body background to prevent flash of white on load
-    // and ensure GlobalBackground's fixed layer always has a base behind it
-    const bg = mode === 'dark' ? '#060A14' : '#EFF6FF'
+    // Set solid base colours so GlobalBackground's fixed layer has a canvas behind it
+    const bg = mode === 'dark' ? '#060A14' : '#EBF5FF'
     document.documentElement.style.backgroundColor = bg
     document.body.style.backgroundColor = bg
   }, [mode])

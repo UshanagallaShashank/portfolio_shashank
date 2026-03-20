@@ -14,7 +14,7 @@
       }
       /* Apply saved theme immediately */
       html[data-theme="light"], body[data-theme="light"] {
-        background-color: #EFF6FF;
+        background-color: #EBF5FF;
       }
     </style>
     <script>
@@ -22,8 +22,8 @@
       try {
         var t = localStorage.getItem('theme') || 'dark';
         document.documentElement.setAttribute('data-theme', t);
-        document.documentElement.style.backgroundColor = t === 'light' ? '#EFF6FF' : '#060A14';
-        document.body && (document.body.style.backgroundColor = t === 'light' ? '#EFF6FF' : '#060A14');
+        document.documentElement.style.backgroundColor = t === 'light' ? '#EBF5FF' : '#060A14';
+        document.body && (document.body.style.backgroundColor = t === 'light' ? '#EBF5FF' : '#060A14');
       } catch(e) {}
     </script>
   </head>

@@ -35,9 +35,10 @@ export default function HeroSection() {
         alignItems: 'center',
         position: 'relative',
         overflow: 'hidden',
+        // Dark mode keeps its own deep gradient; light mode is transparent so GlobalBackground shows through
         background: isDark
           ? 'linear-gradient(135deg, #0A0E1A 0%, #0F1629 50%, #141c30 100%)'
-          : 'linear-gradient(135deg, #F0F7FF 0%, #E8F4FD 50%, #F0F7FF 100%)',
+          : 'transparent',
       }}
     >
       {/* Animated background orbs */}

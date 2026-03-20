@@ -130,8 +130,8 @@ export const lightMuiTheme = createTheme({
       light: tokens.colors.accentLight,
     },
     background: {
-      default: tokens.colors.lightBg,
-      paper: tokens.colors.lightBgCard,
+      default: 'transparent',   // GlobalBackground handles the real bg
+      paper: 'rgba(255,255,255,0.75)',
     },
     text: {
       primary: tokens.colors.lightTextPrimary,

@@ -20,18 +20,25 @@ export default function GlassCard({ children, hover = true, glow = false, sx, ..
       transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       sx={{
         background: isDark
-          ? 'rgba(20, 28, 48, 0.8)'
-          : 'rgba(255, 255, 255, 0.9)',
-        backdropFilter: 'blur(16px)',
-        border: `1px solid ${isDark ? 'rgba(0,180,216,0.15)' : 'rgba(0,150,183,0.15)'}`,
+          ? 'rgba(15, 22, 42, 0.75)'
+          : 'rgba(255, 255, 255, 0.72)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: isDark
+          ? '1px solid rgba(0,180,216,0.15)'
+          : '1px solid rgba(0,150,183,0.22)',
         borderRadius: 3,
+        boxShadow: isDark
+          ? (glow ? '0 0 24px rgba(0,180,216,0.14)' : '0 2px 16px rgba(0,0,0,0.35)')
+          : (glow
+            ? '0 0 28px rgba(0,150,183,0.2), 0 4px 20px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.85)'
+            : '0 4px 20px rgba(0,150,183,0.1), 0 1px 4px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.85)'),
         transition: 'all 0.3s ease',
-        ...(glow && {
-          boxShadow: '0 0 20px rgba(0,180,216,0.12)',
-        }),
         '&:hover': hover ? {
-          borderColor: 'rgba(0,180,216,0.4)',
-          boxShadow: '0 8px 32px rgba(0,180,216,0.18)',
+          borderColor: isDark ? 'rgba(0,180,216,0.4)' : 'rgba(0,180,216,0.5)',
+          boxShadow: isDark
+            ? '0 8px 32px rgba(0,180,216,0.18)'
+            : '0 8px 36px rgba(0,150,183,0.22), 0 2px 8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9)',
         } : {},
         ...sx,
       }}
