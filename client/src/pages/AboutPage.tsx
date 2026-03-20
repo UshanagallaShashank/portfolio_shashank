@@ -48,7 +48,7 @@ export default function AboutPage() {
 
           <Grid size={{ xs: 12, md: 7 }}>
             <motion.div variants={fadeInRight} initial="hidden" animate={inView ? 'visible' : 'hidden'}>
-              <Typography variant="h4" fontWeight={700} sx={{ mb: 2, color: '#E2E8F0' }}>
+              <Typography variant="h4" fontWeight={700} sx={{ mb: 2, color: 'text.primary' }}>
                 Full-Stack Developer &{' '}
                 <Box component="span" sx={{ background: 'linear-gradient(135deg, #00B4D8, #7C3AED)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                   AI Engineer
@@ -68,7 +68,7 @@ export default function AboutPage() {
                     <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
                       {item.label}
                     </Typography>
-                    <Typography variant="body2" fontWeight={600} sx={{ color: '#E2E8F0', mt: 0.5, wordBreak: 'break-all' }}>
+                    <Typography variant="body2" fontWeight={600} sx={{ color: 'text.primary', mt: 0.5, wordBreak: 'break-all' }}>
                       {item.value}
                     </Typography>
                   </GlassCard>

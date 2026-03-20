@@ -12,11 +12,13 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn'
 import TypewriterText from '../../ui/TypewriterText'
 import { PERSONAL } from '../../../constants/personal'
 import { staggerContainer, fadeInLeft, fadeInRight, fadeInUp } from '../../../utils/animationVariants'
+import { useTheme } from '../../../context/ThemeContext'
 
 export default function HeroSection() {
   const { data: stats } = useApiCache<Stat[]>('stats', fetchStats)
   const { data: profile } = useApiCache<ProfileSettings>('profile', fetchProfile)
   const avatarUrl = profile?.hero_avatar_url ?? profile?.avatar_url ?? PERSONAL.avatarUrl
+  const { isDark } = useTheme()
 
   const handleDownload = () => {
     window.open(
@@ -33,7 +35,9 @@ export default function HeroSection() {
         alignItems: 'center',
         position: 'relative',
         overflow: 'hidden',
-        background: 'linear-gradient(135deg, #0A0E1A 0%, #0F1629 50%, #141c30 100%)',
+        background: isDark
+          ? 'linear-gradient(135deg, #0A0E1A 0%, #0F1629 50%, #141c30 100%)'
+          : 'linear-gradient(135deg, #F0F7FF 0%, #E8F4FD 50%, #F0F7FF 100%)',
       }}
     >
       {/* Animated background orbs */}
@@ -112,7 +116,7 @@ export default function HeroSection() {
                 fontSize: { xs: '2.4rem', sm: '3rem', md: '3.8rem' },
                 lineHeight: 1.1,
                 letterSpacing: '-0.03em',
-                color: '#E2E8F0',
+                color: 'text.primary',
                 mb: 1,
               }}
             >
@@ -135,7 +139,7 @@ export default function HeroSection() {
 
             <Typography
               variant="body1"
-              sx={{ color: '#94A3B8', lineHeight: 1.8, mb: 4, fontSize: { xs: '0.95rem', md: '1.05rem' } }}
+              sx={{ color: 'text.secondary', lineHeight: 1.8, mb: 4, fontSize: { xs: '0.95rem', md: '1.05rem' } }}
             >
               {PERSONAL.bio}
             </Typography>
@@ -194,8 +198,9 @@ export default function HeroSection() {
                     <IconButton
                       component="a" href={s.href} target="_blank" rel="noopener noreferrer"
                       sx={{
-                        color: '#94A3B8',
-                        border: '1px solid rgba(148,163,184,0.2)',
+                        color: 'text.secondary',
+                        border: '1px solid',
+                        borderColor: 'divider',
                         borderRadius: 2,
                         '&:hover': { color: '#00B4D8', borderColor: 'rgba(0,180,216,0.4)', background: 'rgba(0,180,216,0.08)' },
                       }}
@@ -228,11 +233,12 @@ export default function HeroSection() {
                     sx={{
                       display: 'inline-flex', alignItems: 'center', gap: 0.5,
                       px: 1.5, py: 0.4, borderRadius: 2,
-                      bgcolor: 'rgba(255,255,255,0.04)',
-                      border: '1px solid rgba(255,255,255,0.08)',
-                      fontSize: 12, color: '#94A3B8', fontWeight: 500,
+                      bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+                      border: '1px solid',
+                      borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)',
+                      fontSize: 12, color: 'text.secondary', fontWeight: 500,
                       transition: 'all 0.2s',
-                      '&:hover': { borderColor: 'rgba(0,180,216,0.35)', color: '#E2E8F0', bgcolor: 'rgba(0,180,216,0.06)' },
+                      '&:hover': { borderColor: 'rgba(0,180,216,0.35)', color: 'text.primary', bgcolor: 'rgba(0,180,216,0.06)' },
                     }}
                   >
                     <span style={{ fontSize: 13 }}>{tech.icon}</span> {tech.label}
@@ -260,26 +266,27 @@ export default function HeroSection() {
                     zIndex: 0,
                   }}
                 />
-                <Box sx={{ position: 'relative', zIndex: 1, p: 0.5, borderRadius: '50%', background: '#0A0E1A' }}>
+                <Box sx={{ position: 'relative', zIndex: 1, p: 0.5, borderRadius: '50%', background: isDark ? '#0A0E1A' : '#F0F7FF' }}>
                   <Avatar
                     src={avatarUrl}
                     alt={PERSONAL.name}
                     sx={{
                       width: { xs: 200, md: 280 },
                       height: { xs: 200, md: 280 },
-                      border: '4px solid #0A0E1A',
+                      border: isDark ? '4px solid #0A0E1A' : '4px solid #F0F7FF',
                     }}
                   />
                 </Box>
                 {/* Status badge */}
                 <Box sx={{
                   position: 'absolute', bottom: 8, right: 8, zIndex: 2,
-                  background: '#141c30', border: '2px solid rgba(0,180,216,0.4)',
+                  background: isDark ? '#141c30' : '#ffffff',
+                  border: '2px solid rgba(0,180,216,0.4)',
                   borderRadius: 2, px: 1.5, py: 0.5,
                   display: 'flex', alignItems: 'center', gap: 0.5,
                 }}>
                   <Box sx={{ width: 8, height: 8, borderRadius: '50%', background: '#10B981', boxShadow: '0 0 8px #10B981' }} />
-                  <Typography sx={{ fontSize: '0.72rem', color: '#94A3B8', fontWeight: 500 }}>Open to work</Typography>
+                  <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary', fontWeight: 500 }}>Open to work</Typography>
                 </Box>
 
               </Box>

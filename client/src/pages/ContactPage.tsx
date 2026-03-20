@@ -60,12 +60,12 @@ export default function ContactPage() {
                       {info.href ? (
                         <Typography
                           component="a" href={info.href}
-                          sx={{ display: 'block', color: '#E2E8F0', fontWeight: 500, textDecoration: 'none', '&:hover': { color: '#00B4D8' } }}
+                          sx={{ display: 'block', color: 'text.primary', fontWeight: 500, textDecoration: 'none', '&:hover': { color: '#00B4D8' } }}
                         >
                           {info.value}
                         </Typography>
                       ) : (
-                        <Typography sx={{ color: '#E2E8F0', fontWeight: 500 }}>{info.value}</Typography>
+                        <Typography sx={{ color: 'text.primary', fontWeight: 500 }}>{info.value}</Typography>
                       )}
                     </Box>
                   </GlassCard>

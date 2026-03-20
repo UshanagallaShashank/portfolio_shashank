@@ -1,12 +1,14 @@
 import { Box, Typography } from '@mui/material'
 import { motion } from 'framer-motion'
+import { useTheme } from '../../context/ThemeContext'
 
 export default function PageLoader() {
+  const { isDark } = useTheme()
   return (
     <Box sx={{
       position: 'fixed',
       inset: 0,
-      bgcolor: '#080D1A',
+      bgcolor: isDark ? '#080D1A' : '#F0F7FF',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
@@ -34,7 +36,7 @@ export default function PageLoader() {
       </motion.div>
 
       {/* Animated bar */}
-      <Box sx={{ width: 120, height: 3, bgcolor: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
+      <Box sx={{ width: 120, height: 3, bgcolor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)', borderRadius: 2, overflow: 'hidden' }}>
         <motion.div
           animate={{ x: ['-100%', '100%'] }}
           transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}

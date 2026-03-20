@@ -9,6 +9,8 @@ import CloseIcon from '@mui/icons-material/Close'
 import { motion, AnimatePresence } from 'framer-motion'
 import { NAV_LINKS } from '../../constants/navigation'
 import { PERSONAL } from '../../constants/personal'
+import ThemeToggle from '../ui/ThemeToggle'
+import { useTheme } from '../../context/ThemeContext'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -16,6 +18,7 @@ export default function Navbar() {
   const muiTheme = useMuiTheme()
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'))
   const location = useLocation()
+  const { isDark } = useTheme()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -27,7 +30,9 @@ export default function Navbar() {
     setDrawerOpen(false)
   }, [location])
 
-  const navBg = scrolled ? 'rgba(10,14,26,0.95)' : 'transparent'
+  const navBg = scrolled
+    ? isDark ? 'rgba(10,14,26,0.95)' : 'rgba(240,247,255,0.95)'
+    : 'transparent'
 
   return (
     <>
@@ -73,7 +78,7 @@ export default function Navbar() {
                         px: 1.5, py: 0.75, borderRadius: 2,
                         fontSize: '0.875rem',
                         fontWeight: isActive ? 600 : 400,
-                        color: isActive ? '#00B4D8' : '#94A3B8',
+                        color: isActive ? '#00B4D8' : 'text.secondary',
                         background: isActive ? 'rgba(0,180,216,0.1)' : 'transparent',
                         border: isActive ? '1px solid rgba(0,180,216,0.3)' : '1px solid transparent',
                         cursor: 'pointer',
@@ -86,11 +91,15 @@ export default function Navbar() {
                   )}
                 </NavLink>
               ))}
+              <Box sx={{ ml: 1 }}>
+                <ThemeToggle />
+              </Box>
             </Box>
           )}
 
           {isMobile && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <ThemeToggle />
               <IconButton onClick={() => setDrawerOpen(true)} sx={{ color: '#00B4D8' }}>
                 <MenuIcon />
               </IconButton>
@@ -106,7 +115,7 @@ export default function Navbar() {
         PaperProps={{
           sx: {
             width: 280,
-            background: '#0F1629',
+            background: isDark ? '#0F1629' : '#F0F7FF',
             borderLeft: '1px solid rgba(0,180,216,0.2)',
           },
         }}
@@ -131,7 +140,7 @@ export default function Navbar() {
                       <ListItemButton
                         sx={{
                           mx: 1, borderRadius: 2,
-                          color: isActive ? '#00B4D8' : '#94A3B8',
+                          color: isActive ? '#00B4D8' : 'text.secondary',
                           background: isActive ? 'rgba(0,180,216,0.1)' : 'transparent',
                         }}
                       >

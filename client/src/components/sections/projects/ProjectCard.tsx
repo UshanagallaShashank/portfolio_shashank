@@ -34,7 +34,7 @@ export default function ProjectCard({ title, description, tech, github, live, st
         </Box>
       )}
 
-      <Typography variant="h6" fontWeight={700} sx={{ color: '#E2E8F0', mb: 1 }}>
+      <Typography variant="h6" fontWeight={700} sx={{ color: 'text.primary', mb: 1 }}>
         {title}
       </Typography>
 
@@ -68,7 +68,7 @@ export default function ProjectCard({ title, description, tech, github, live, st
           )}
           {forks !== undefined && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>
-              <ForkRightIcon sx={{ fontSize: 14, color: '#94A3B8' }} />
+              <ForkRightIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
               <Typography variant="caption" color="text.secondary">{forks}</Typography>
             </Box>
           )}
@@ -86,7 +86,7 @@ export default function ProjectCard({ title, description, tech, github, live, st
                 <IconButton
                   component="a" href={github} target="_blank" rel="noopener noreferrer"
                   size="small"
-                  sx={{ color: '#94A3B8', '&:hover': { color: '#00B4D8' } }}
+                  sx={{ color: 'text.secondary', '&:hover': { color: '#00B4D8' } }}
                 >
                   <GitHubIcon fontSize="small" />
                 </IconButton>
@@ -99,7 +99,7 @@ export default function ProjectCard({ title, description, tech, github, live, st
                 <IconButton
                   component="a" href={live} target="_blank" rel="noopener noreferrer"
                   size="small"
-                  sx={{ color: '#94A3B8', '&:hover': { color: '#00B4D8' } }}
+                  sx={{ color: 'text.secondary', '&:hover': { color: '#00B4D8' } }}
                 >
                   <OpenInNewIcon fontSize="small" />
                 </IconButton>

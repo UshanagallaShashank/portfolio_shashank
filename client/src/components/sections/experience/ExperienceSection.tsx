@@ -80,7 +80,7 @@ export default function ExperienceSection() {
                   <Box sx={{ display: { xs: 'block', md: 'none' }, mb: 1 }}>
                     <Typography variant="caption" color="text.secondary">{exp.period}</Typography>
                   </Box>
-                  <Typography variant="h6" fontWeight={700} sx={{ color: '#E2E8F0', mb: 0.5 }}>
+                  <Typography variant="h6" fontWeight={700} sx={{ color: 'text.primary', mb: 0.5 }}>
                     {exp.role}
                   </Typography>
                   <Typography
@@ -100,7 +100,7 @@ export default function ExperienceSection() {
                       <Box
                         key={j}
                         component="li"
-                        sx={{ color: '#94A3B8', fontSize: '0.875rem', lineHeight: 1.7, mb: 0.5, textAlign: 'left' }}
+                        sx={{ color: 'text.secondary', fontSize: '0.875rem', lineHeight: 1.7, mb: 0.5, textAlign: 'left' }}
                       >
                         {h}
                       </Box>

@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react'
 import { Box } from '@mui/material'
 import { motion, AnimatePresence } from 'framer-motion'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import { useTheme } from '../../context/ThemeContext'
 
 export default function ScrollDownIndicator() {
   const [visible, setVisible] = useState(false)
+  const { isDark } = useTheme()
 
   useEffect(() => {
     const check = () => {
@@ -48,7 +50,7 @@ export default function ScrollDownIndicator() {
               width: 44,
               height: 44,
               borderRadius: '50%',
-              bgcolor: 'rgba(10,15,30,0.85)',
+              bgcolor: isDark ? 'rgba(10,15,30,0.85)' : 'rgba(240,247,255,0.9)',
               border: '1px solid rgba(0,180,216,0.35)',
               backdropFilter: 'blur(12px)',
               display: 'flex',

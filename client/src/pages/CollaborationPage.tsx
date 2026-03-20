@@ -59,7 +59,7 @@ export default function CollaborationPage() {
             textAlign: 'center',
           }}
         >
-          <Typography variant="h3" fontWeight={800} sx={{ color: '#E2E8F0', mb: 2, fontSize: { xs: '1.8rem', md: '2.5rem' } }}>
+          <Typography variant="h3" fontWeight={800} sx={{ color: 'text.primary', mb: 2, fontSize: { xs: '1.8rem', md: '2.5rem' } }}>
             Available for Freelance Work
           </Typography>
           <Typography color="text.secondary" sx={{ mb: 4, maxWidth: 560, mx: 'auto', fontSize: '1.05rem', lineHeight: 1.7 }}>
@@ -108,7 +108,7 @@ export default function CollaborationPage() {
                   <motion.div key={s.id} variants={fadeInUp}>
                     <GlassCard sx={{ p: 3 }}>
                       <Box sx={{ mb: 2 }}>{getIcon(s.icon, s.color)}</Box>
-                      <Typography fontWeight={700} sx={{ color: '#E2E8F0', mb: 1 }}>{s.title}</Typography>
+                      <Typography fontWeight={700} sx={{ color: 'text.primary', mb: 1 }}>{s.title}</Typography>
                       <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>{s.description}</Typography>
                     </GlassCard>
                   </motion.div>
@@ -123,7 +123,7 @@ export default function CollaborationPage() {
                   {projects.map((p) => (
                     <Grid key={p.id} size={{ xs: 12, md: 6 }}>
                       <GlassCard sx={{ p: 4 }}>
-                        <Typography variant="h6" fontWeight={700} sx={{ color: '#E2E8F0', mb: 1 }}>{p.title}</Typography>
+                        <Typography variant="h6" fontWeight={700} sx={{ color: 'text.primary', mb: 1 }}>{p.title}</Typography>
                         <Typography color="text.secondary" sx={{ mb: 3, lineHeight: 1.7 }}>{p.description}</Typography>
                         {p.link && (
                           <Button
@@ -139,7 +139,7 @@ export default function CollaborationPage() {
                   ))}
                   <Grid size={{ xs: 12, md: projects.length % 2 === 0 ? 12 : 6 }}>
                     <GlassCard sx={{ p: 4, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center' }}>
-                      <Typography variant="h6" sx={{ mb: 1, color: '#E2E8F0' }}>More Projects</Typography>
+                      <Typography variant="h6" sx={{ mb: 1, color: 'text.primary' }}>More Projects</Typography>
                       <Typography color="text.secondary" sx={{ mb: 2 }}>
                         Looking for a freelancer? Send me a message.
                       </Typography>

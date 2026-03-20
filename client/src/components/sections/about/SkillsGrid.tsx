@@ -49,7 +49,7 @@ export default function SkillsGrid() {
               borderRadius: 2,
             },
             '& .MuiTab-root': {
-              color: '#64748B',
+              color: 'text.secondary',
               fontWeight: 500,
               textTransform: 'none',
               '&.Mui-selected': { color: '#00B4D8', fontWeight: 600 },
@@ -79,7 +79,7 @@ export default function SkillsGrid() {
                   {skill.icon_url && (
                     <Box sx={{ fontSize: '1.4rem', lineHeight: 1 }}>{skill.icon_url}</Box>
                   )}
-                  <Typography variant="body2" fontWeight={600} sx={{ color: '#E2E8F0' }}>
+                  <Typography variant="body2" fontWeight={600} sx={{ color: 'text.primary' }}>
                     {skill.name}
                   </Typography>
                 </Box>
