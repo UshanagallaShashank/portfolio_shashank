@@ -31,17 +31,28 @@ export default function Footer() {
       <Container maxWidth="lg" sx={{ py: 6 }}>
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4, justifyContent: 'space-between' }}>
           {/* Brand */}
-          <Box sx={{ maxWidth: 280 }}>
-            <Typography
-              sx={{
-                fontWeight: 800, fontSize: '1.4rem',
-                background: 'linear-gradient(135deg, #00B4D8, #7C3AED)',
-                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-                mb: 1,
-              }}
-            >
-              {PERSONAL.firstName}.
-            </Typography>
+          <Box sx={{ maxWidth: 300 }}>
+            <Box sx={{ mb: 1 }}>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase',
+                  color: 'text.secondary', opacity: 0.7, fontSize: '0.65rem', display: 'block',
+                }}
+              >
+                Ushanagalla
+              </Typography>
+              <Typography
+                sx={{
+                  fontWeight: 800, fontSize: '1.4rem',
+                  background: 'linear-gradient(135deg, #00B4D8, #7C3AED)',
+                  WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                  lineHeight: 1.1,
+                }}
+              >
+                {PERSONAL.firstName}.
+              </Typography>
+            </Box>
             <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.7 }}>
               Developer at RealPage Inc. Building AI-powered products that matter.
             </Typography>

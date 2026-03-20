@@ -48,7 +48,10 @@ export default function AboutPage() {
 
           <Grid size={{ xs: 12, md: 7 }}>
             <motion.div variants={fadeInRight} initial="hidden" animate={inView ? 'visible' : 'hidden'}>
-              <Typography variant="h4" fontWeight={700} sx={{ mb: 2, color: 'text.primary' }}>
+              <Typography variant="h4" fontWeight={800} sx={{ mb: 0.5, color: 'text.primary', letterSpacing: '-0.02em' }}>
+                {PERSONAL.name}
+              </Typography>
+              <Typography variant="h6" fontWeight={500} sx={{ mb: 2 }}>
                 Full-Stack Developer &{' '}
                 <Box component="span" sx={{ background: 'linear-gradient(135deg, #00B4D8, #7C3AED)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                   AI Engineer

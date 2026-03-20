@@ -114,7 +114,7 @@ export default function HeroSection() {
               variant="h1"
               sx={{
                 fontWeight: 900,
-                fontSize: { xs: '2.4rem', sm: '3rem', md: '3.8rem' },
+                fontSize: { xs: '2rem', sm: '2.6rem', md: '3.2rem' },
                 lineHeight: 1.1,
                 letterSpacing: '-0.03em',
                 color: 'text.primary',
@@ -127,7 +127,7 @@ export default function HeroSection() {
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}>
-                {PERSONAL.firstName}
+                {PERSONAL.name}
               </Box>
             </Typography>
 

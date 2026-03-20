@@ -19,6 +19,7 @@ import LogoutIcon from '@mui/icons-material/Logout'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import MenuIcon from '@mui/icons-material/Menu'
 import { useAuth } from '../../hooks/useAuth'
+import { PERSONAL } from '../../constants/personal'
 import { fetchDashboardStats } from '../../api/admin'
 import type { DashboardStats } from '../../api/admin'
 import GlassCard from '../../components/ui/GlassCard'
@@ -118,15 +119,18 @@ function DrawerContent({ user, onClose, onLogout }: {
           }}>
             <Typography sx={{ color: '#fff', fontWeight: 900, fontSize: 16, lineHeight: 1 }}>S</Typography>
           </Box>
-          <Box>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography sx={{ fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'text.secondary', opacity: 0.7, lineHeight: 1 }}>
+              Ushanagalla
+            </Typography>
             <Typography fontWeight={800} sx={{
               background: 'linear-gradient(135deg, #00B4D8, #7C3AED)',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
               fontSize: 15, lineHeight: 1.2,
             }}>
-              Shashank
+              {PERSONAL.firstName}
             </Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ fontSize: 11 }}>Admin Panel</Typography>
+            <Typography variant="caption" color="text.secondary" sx={{ fontSize: 10 }}>Admin Panel</Typography>
           </Box>
         </Box>
       </Box>
