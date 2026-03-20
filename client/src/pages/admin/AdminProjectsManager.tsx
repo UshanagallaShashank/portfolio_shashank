@@ -79,6 +79,9 @@ function DbProjectsTab() {
         x.id === visibilityTarget.id ? { ...x, is_visible: !visibilityTarget.is_visible } : x
       ))
       setVisibilityTarget(null)
+    } catch {
+      setSnack({ msg: 'Failed to update visibility. Is the backend running?', severity: 'error' })
+      setVisibilityTarget(null)
     } finally { setToggling(false) }
   }
 

@@ -1,16 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   Box, Typography, CircularProgress, Button, Chip,
-  Dialog, DialogTitle, DialogContent, DialogActions, Avatar,
+  Dialog, DialogTitle, DialogContent, DialogActions, Avatar, Divider,
 } from '@mui/material'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import CloudUploadIcon from '@mui/icons-material/CloudUpload'
 import DeleteIcon from '@mui/icons-material/Delete'
-import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked'
 import ImageIcon from '@mui/icons-material/Image'
+import HomeIcon from '@mui/icons-material/Home'
+import PersonIcon from '@mui/icons-material/Person'
+import LinkOffIcon from '@mui/icons-material/LinkOff'
 import GlassCard from '../../components/ui/GlassCard'
 import apiClient from '../../api/client'
 import { invalidateCache } from '../../hooks/useApiCache'
+import { assignPhotoToSection, unsetSection, fetchProfile } from '../../api/profile'
 
 interface ProfilePhoto {
   id: string
@@ -22,19 +25,28 @@ interface ProfilePhoto {
 
 export default function AdminProfileManager() {
   const [photos, setPhotos] = useState<ProfilePhoto[]>([])
+  const [heroUrl, setHeroUrl] = useState<string | null>(null)
+  const [aboutUrl, setAboutUrl] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState('')
-  const [activating, setActivating] = useState<string | null>(null)
+  const [assigning, setAssigning] = useState<string | null>(null)
+  const [unsetting, setUnsetting] = useState<'hero' | 'about' | null>(null)
   const [dragging, setDragging] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<ProfilePhoto | null>(null)
   const [deleting, setDeleting] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const load = () =>
-    apiClient.get<ProfilePhoto[]>('/api/profile/photos')
-      .then((r) => setPhotos(r.data))
-      .finally(() => setLoading(false))
+  const load = async () => {
+    const [photosRes, profile] = await Promise.all([
+      apiClient.get<ProfilePhoto[]>('/api/profile/photos'),
+      fetchProfile(),
+    ])
+    setPhotos(photosRes.data)
+    setHeroUrl(profile.hero_avatar_url ?? null)
+    setAboutUrl(profile.about_avatar_url ?? null)
+    setLoading(false)
+  }
 
   useEffect(() => { load() }, [])
 
@@ -68,14 +80,27 @@ export default function AdminProfileManager() {
     if (file) handleFile(file)
   }
 
-  const handleActivate = async (id: string) => {
-    setActivating(id)
+  const handleAssign = async (photo: ProfilePhoto, section: 'hero' | 'about') => {
+    setAssigning(`${photo.id}:${section}`)
     try {
-      await apiClient.post(`/api/profile/photos/${id}/activate`)
-      setPhotos((prev) => prev.map((p) => ({ ...p, is_active: p.id === id })))
+      await assignPhotoToSection(photo.id, section)
+      if (section === 'hero') setHeroUrl(photo.public_url)
+      else setAboutUrl(photo.public_url)
       invalidateCache('profile')
     } finally {
-      setActivating(null)
+      setAssigning(null)
+    }
+  }
+
+  const handleUnset = async (section: 'hero' | 'about') => {
+    setUnsetting(section)
+    try {
+      await unsetSection(section)
+      if (section === 'hero') setHeroUrl(null)
+      else setAboutUrl(null)
+      invalidateCache('profile')
+    } finally {
+      setUnsetting(null)
     }
   }
 
@@ -85,13 +110,13 @@ export default function AdminProfileManager() {
     try {
       await apiClient.delete(`/api/profile/photos/${deleteTarget.id}`)
       setPhotos((prev) => prev.filter((p) => p.id !== deleteTarget.id))
+      if (heroUrl === deleteTarget.public_url) setHeroUrl(null)
+      if (aboutUrl === deleteTarget.public_url) setAboutUrl(null)
       setDeleteTarget(null)
     } finally {
       setDeleting(false)
     }
   }
-
-  const activePhoto = photos.find((p) => p.is_active)
 
   if (loading) return (
     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
@@ -99,34 +124,69 @@ export default function AdminProfileManager() {
     </Box>
   )
 
-  return (
-    <Box>
-      {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4, flexWrap: 'wrap', gap: 2 }}>
-        <Box>
-          <Typography variant="h4" fontWeight={800} color="#E2E8F0">Profile Photo</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            Upload photos and set one as active — it appears in the hero section of your portfolio.
-          </Typography>
-        </Box>
-        {activePhoto && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-            <Box sx={{
-              p: 0.3, borderRadius: '50%',
-              background: 'conic-gradient(from 0deg, #00B4D8, #7C3AED, #00B4D8)',
-            }}>
-              <Box sx={{ p: 0.25, borderRadius: '50%', bgcolor: '#0A0F1E' }}>
-                <Avatar src={activePhoto.public_url} sx={{ width: 44, height: 44 }} />
-              </Box>
+  const SectionSlot = ({ section, url, icon, label }: {
+    section: 'hero' | 'about'; url: string | null; icon: React.ReactNode; label: string
+  }) => (
+    <GlassCard hover={false} sx={{ p: 2.5, flex: 1, minWidth: 200 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+        <Box sx={{ color: '#00B4D8' }}>{icon}</Box>
+        <Typography fontWeight={700} color="#E2E8F0" fontSize={14}>{label}</Typography>
+      </Box>
+      {url ? (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Box sx={{
+            p: 0.3, borderRadius: '50%',
+            background: 'conic-gradient(from 0deg, #00B4D8, #7C3AED, #00B4D8)',
+          }}>
+            <Box sx={{ p: 0.25, borderRadius: '50%', bgcolor: '#0A0F1E' }}>
+              <Avatar src={url} sx={{ width: 40, height: 40 }} />
             </Box>
+          </Box>
+          <Box sx={{ flex: 1 }}>
             <Chip
-              icon={<RadioButtonCheckedIcon sx={{ fontSize: '13px !important', color: '#10B981 !important' }} />}
-              label="Live photo"
-              sx={{ bgcolor: 'rgba(16,185,129,0.12)', color: '#10B981', border: '1px solid rgba(16,185,129,0.3)' }}
+              icon={<CheckCircleIcon sx={{ fontSize: '12px !important', color: '#10B981 !important' }} />}
+              label="Active"
+              size="small"
+              sx={{ bgcolor: 'rgba(16,185,129,0.12)', color: '#10B981', border: '1px solid rgba(16,185,129,0.3)', height: 20, fontSize: 11 }}
             />
           </Box>
-        )}
+          <Button
+            size="small"
+            startIcon={unsetting === section ? <CircularProgress size={12} color="inherit" /> : <LinkOffIcon sx={{ fontSize: '14px !important' }} />}
+            disabled={!!unsetting}
+            onClick={() => handleUnset(section)}
+            sx={{
+              color: '#64748B', textTransform: 'none', fontSize: 12,
+              '&:hover': { color: '#EF4444', bgcolor: 'rgba(239,68,68,0.06)' },
+            }}
+          >
+            Unset
+          </Button>
+        </Box>
+      ) : (
+        <Typography variant="caption" color="text.secondary">
+          No photo set — pick one below.
+        </Typography>
+      )}
+    </GlassCard>
+  )
+
+  return (
+    <Box>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" fontWeight={800} color="#E2E8F0">Profile Photos</Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+          Upload photos and assign them independently to the Hero and About sections.
+        </Typography>
       </Box>
+
+      {/* Active section slots */}
+      <Box sx={{ display: 'flex', gap: 2, mb: 4, flexWrap: 'wrap' }}>
+        <SectionSlot section="hero" url={heroUrl} icon={<HomeIcon fontSize="small" />} label="Hero Section" />
+        <SectionSlot section="about" url={aboutUrl} icon={<PersonIcon fontSize="small" />} label="About Page" />
+      </Box>
+
+      <Divider sx={{ borderColor: 'rgba(255,255,255,0.06)', mb: 4 }} />
 
       {/* Upload zone */}
       <GlassCard
@@ -186,78 +246,102 @@ export default function AdminProfileManager() {
           <Typography variant="overline" color="text.secondary" sx={{ letterSpacing: 2, fontSize: 11 }}>
             {photos.length} photo{photos.length !== 1 ? 's' : ''}
           </Typography>
-          {photos.map((p) => (
-            <GlassCard
-              key={p.id}
-              hover={false}
-              sx={{
-                p: 2.5,
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                border: p.is_active ? '1px solid rgba(16,185,129,0.4)' : '1px solid rgba(255,255,255,0.05)',
-                background: p.is_active ? 'rgba(16,185,129,0.04)' : 'rgba(255,255,255,0.02)',
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, overflow: 'hidden', flex: 1 }}>
-                <Avatar
-                  src={p.public_url}
-                  sx={{
-                    width: 48, height: 48, flexShrink: 0, borderRadius: 2,
-                    border: p.is_active ? '2px solid rgba(16,185,129,0.5)' : '2px solid rgba(255,255,255,0.08)',
-                  }}
-                />
-                <Box sx={{ overflow: 'hidden', flex: 1 }}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-                    <Typography fontWeight={600} color="#E2E8F0" noWrap sx={{ maxWidth: { xs: 140, md: 320 } }}>
-                      {p.storage_path}
+          {photos.map((p) => {
+            const isHero = heroUrl === p.public_url
+            const isAbout = aboutUrl === p.public_url
+            return (
+              <GlassCard
+                key={p.id}
+                hover={false}
+                sx={{
+                  p: 2.5,
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  border: (isHero || isAbout) ? '1px solid rgba(0,180,216,0.3)' : '1px solid rgba(255,255,255,0.05)',
+                  background: (isHero || isAbout) ? 'rgba(0,180,216,0.03)' : 'rgba(255,255,255,0.02)',
+                  flexWrap: 'wrap', gap: 1,
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, overflow: 'hidden', flex: 1 }}>
+                  <Avatar
+                    src={p.public_url}
+                    sx={{
+                      width: 48, height: 48, flexShrink: 0, borderRadius: 2,
+                      border: (isHero || isAbout) ? '2px solid rgba(0,180,216,0.4)' : '2px solid rgba(255,255,255,0.08)',
+                    }}
+                  />
+                  <Box sx={{ overflow: 'hidden', flex: 1 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap', mb: 0.25 }}>
+                      <Typography fontWeight={600} color="#E2E8F0" noWrap sx={{ maxWidth: { xs: 120, md: 280 }, fontSize: 13 }}>
+                        {p.storage_path}
+                      </Typography>
+                      {isHero && (
+                        <Chip icon={<HomeIcon sx={{ fontSize: '10px !important' }} />} label="Hero"
+                          size="small" sx={{ height: 18, fontSize: 10, bgcolor: 'rgba(0,180,216,0.15)', color: '#00B4D8' }} />
+                      )}
+                      {isAbout && (
+                        <Chip icon={<PersonIcon sx={{ fontSize: '10px !important' }} />} label="About"
+                          size="small" sx={{ height: 18, fontSize: 10, bgcolor: 'rgba(124,58,237,0.15)', color: '#A78BFA' }} />
+                      )}
+                    </Box>
+                    <Typography variant="caption" color="text.secondary">
+                      {new Date(p.uploaded_at).toLocaleString()}
                     </Typography>
-                    {p.is_active && (
-                      <Chip
-                        icon={<CheckCircleIcon sx={{ fontSize: '12px !important' }} />}
-                        label="Live"
-                        size="small"
-                        sx={{ bgcolor: 'rgba(16,185,129,0.15)', color: '#10B981', height: 20, fontSize: 11 }}
-                      />
-                    )}
                   </Box>
-                  <Typography variant="caption" color="text.secondary">
-                    {new Date(p.uploaded_at).toLocaleString()}
-                  </Typography>
                 </Box>
-              </Box>
 
-              <Box sx={{ display: 'flex', gap: 1, flexShrink: 0, ml: 2 }}>
-                <Button
-                  component="a" href={p.public_url} target="_blank" rel="noopener noreferrer"
-                  size="small"
-                  sx={{ color: '#64748B', textTransform: 'none', fontSize: 13, minWidth: 0 }}
-                >
-                  View
-                </Button>
-                {!p.is_active && (
+                <Box sx={{ display: 'flex', gap: 1, flexShrink: 0, flexWrap: 'wrap', alignItems: 'center' }}>
+                  <Button
+                    component="a" href={p.public_url} target="_blank" rel="noopener noreferrer"
+                    size="small"
+                    sx={{ color: '#64748B', textTransform: 'none', fontSize: 12, minWidth: 0 }}
+                  >
+                    View
+                  </Button>
+                  {!isHero && (
+                    <Button
+                      size="small" variant="outlined"
+                      disabled={!!assigning}
+                      onClick={() => handleAssign(p, 'hero')}
+                      startIcon={assigning === `${p.id}:hero`
+                        ? <CircularProgress size={12} color="inherit" />
+                        : <HomeIcon sx={{ fontSize: '14px !important' }} />}
+                      sx={{
+                        borderColor: 'rgba(0,180,216,0.4)', color: '#00B4D8',
+                        textTransform: 'none', fontSize: 12,
+                        '&:hover': { borderColor: '#00B4D8', background: 'rgba(0,180,216,0.08)' },
+                      }}
+                    >
+                      Set Hero
+                    </Button>
+                  )}
+                  {!isAbout && (
+                    <Button
+                      size="small" variant="outlined"
+                      disabled={!!assigning}
+                      onClick={() => handleAssign(p, 'about')}
+                      startIcon={assigning === `${p.id}:about`
+                        ? <CircularProgress size={12} color="inherit" />
+                        : <PersonIcon sx={{ fontSize: '14px !important' }} />}
+                      sx={{
+                        borderColor: 'rgba(124,58,237,0.4)', color: '#A78BFA',
+                        textTransform: 'none', fontSize: 12,
+                        '&:hover': { borderColor: '#A78BFA', background: 'rgba(124,58,237,0.08)' },
+                      }}
+                    >
+                      Set About
+                    </Button>
+                  )}
                   <Button
                     size="small"
-                    variant="outlined"
-                    disabled={!!activating}
-                    onClick={() => handleActivate(p.id)}
-                    sx={{
-                      borderColor: 'rgba(0,180,216,0.4)', color: '#00B4D8',
-                      textTransform: 'none', fontSize: 13, whiteSpace: 'nowrap',
-                      '&:hover': { borderColor: '#00B4D8', background: 'rgba(0,180,216,0.08)' },
-                    }}
+                    onClick={() => setDeleteTarget(p)}
+                    sx={{ minWidth: 36, color: '#EF4444', '&:hover': { background: 'rgba(239,68,68,0.08)' } }}
                   >
-                    {activating === p.id ? <CircularProgress size={14} color="inherit" /> : 'Set Live'}
+                    <DeleteIcon sx={{ fontSize: 18 }} />
                   </Button>
-                )}
-                <Button
-                  size="small"
-                  onClick={() => setDeleteTarget(p)}
-                  sx={{ minWidth: 36, color: '#EF4444', '&:hover': { background: 'rgba(239,68,68,0.08)' } }}
-                >
-                  <DeleteIcon sx={{ fontSize: 18 }} />
-                </Button>
-              </Box>
-            </GlassCard>
-          ))}
+                </Box>
+              </GlassCard>
+            )
+          })}
         </Box>
       )}
 
@@ -273,9 +357,12 @@ export default function AdminProfileManager() {
             {deleteTarget && <Avatar src={deleteTarget.public_url} sx={{ width: 56, height: 56, borderRadius: 2 }} />}
             <Typography color="text.secondary" sx={{ lineHeight: 1.7 }}>
               This will permanently remove the photo from storage.
-              {deleteTarget?.is_active && (
+              {(heroUrl === deleteTarget?.public_url || aboutUrl === deleteTarget?.public_url) && (
                 <Box component="span" sx={{ color: '#F59E0B', display: 'block', mt: 0.5, fontSize: 13 }}>
-                  ⚠ This is your currently live photo.
+                  ⚠ Currently active in{' '}
+                  {heroUrl === deleteTarget?.public_url && aboutUrl === deleteTarget?.public_url
+                    ? 'Hero & About'
+                    : heroUrl === deleteTarget?.public_url ? 'Hero' : 'About'}.
                 </Box>
               )}
             </Typography>

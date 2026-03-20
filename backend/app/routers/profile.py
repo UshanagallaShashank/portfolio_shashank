@@ -8,6 +8,7 @@ from app.config import get_settings
 router = APIRouter()
 BUCKET = "avatars"
 ALLOWED_EXTS = (".jpg", ".jpeg", ".png", ".webp", ".gif")
+SECTIONS = ("hero", "about")
 
 
 @router.get("")
@@ -24,7 +25,7 @@ async def update_profile(body: dict):
     return svc.get_settings_dict()
 
 
-# ── Photo versions ─────────────────────────────────────────────────────────────
+# ── Photo list & upload ─────────────────────────────────────────────────────────
 
 @router.get("/photos", dependencies=[Depends(require_admin)])
 async def list_photos():
@@ -65,14 +66,31 @@ async def upload_photo(file: UploadFile = File(...)):
     return photo
 
 
-@router.post("/photos/{photo_id}/activate", dependencies=[Depends(require_admin)])
-async def activate_photo(photo_id: str):
+# ── Assign photo to a section ───────────────────────────────────────────────────
+
+@router.post("/photos/{photo_id}/assign/{section}", dependencies=[Depends(require_admin)])
+async def assign_photo(photo_id: str, section: str):
+    if section not in SECTIONS:
+        raise HTTPException(status_code=400, detail=f"section must be one of {SECTIONS}")
     svc = get_supabase_service()
     photo = svc.get_profile_photo(photo_id)
     if not photo:
         raise HTTPException(status_code=404, detail="Photo not found")
-    return svc.activate_profile_photo(photo_id)
+    svc.upsert_setting(f"{section}_avatar_url", photo["public_url"])
+    return {"section": section, "url": photo["public_url"]}
 
+
+# ── Unset a section (revert to default) ────────────────────────────────────────
+
+@router.delete("/sections/{section}", dependencies=[Depends(require_admin)], status_code=204)
+async def unset_section(section: str):
+    if section not in SECTIONS:
+        raise HTTPException(status_code=400, detail=f"section must be one of {SECTIONS}")
+    svc = get_supabase_service()
+    svc.delete_setting(f"{section}_avatar_url")
+
+
+# ── Delete photo from storage + DB ─────────────────────────────────────────────
 
 @router.delete("/photos/{photo_id}", dependencies=[Depends(require_admin)], status_code=204)
 async def delete_photo(photo_id: str):
@@ -88,5 +106,12 @@ async def delete_photo(photo_id: str):
         storage_client.storage.from_(BUCKET).remove([photo["storage_path"]])
     except Exception:
         pass
+
+    # Clear any section references to this photo
+    url = photo["public_url"]
+    settings = svc.get_settings_dict()
+    for section in SECTIONS:
+        if settings.get(f"{section}_avatar_url") == url:
+            svc.delete_setting(f"{section}_avatar_url")
 
     svc.delete_profile_photo(photo_id)

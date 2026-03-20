@@ -7,9 +7,14 @@ import GlassCard from '../components/ui/GlassCard'
 import PageWrapper from '../components/layout/PageWrapper'
 import { PERSONAL } from '../constants/personal'
 import { fadeInLeft, fadeInRight } from '../utils/animationVariants'
+import { useApiCache } from '../hooks/useApiCache'
+import { fetchProfile } from '../api/profile'
+import type { ProfileSettings } from '../api/profile'
 
 export default function AboutPage() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 })
+  const { data: profile } = useApiCache<ProfileSettings>('profile', fetchProfile)
+  const avatarUrl = profile?.about_avatar_url ?? profile?.avatar_url ?? PERSONAL.avatarUrl
 
   return (
     <PageWrapper>
@@ -31,7 +36,7 @@ export default function AboutPage() {
                     filter: 'blur(20px)',
                   }} />
                   <Avatar
-                    src={PERSONAL.avatarUrl}
+                    src={avatarUrl}
                     alt={PERSONAL.name}
                     sx={{ width: 280, height: 280, borderRadius: 4, position: 'relative', zIndex: 1 }}
                     variant="rounded"

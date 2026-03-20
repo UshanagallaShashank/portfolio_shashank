@@ -16,7 +16,7 @@ import { staggerContainer, fadeInLeft, fadeInRight, fadeInUp } from '../../../ut
 export default function HeroSection() {
   const { data: stats } = useApiCache<Stat[]>('stats', fetchStats)
   const { data: profile } = useApiCache<ProfileSettings>('profile', fetchProfile)
-  const avatarUrl = profile?.avatar_url ?? PERSONAL.avatarUrl
+  const avatarUrl = profile?.hero_avatar_url ?? profile?.avatar_url ?? PERSONAL.avatarUrl
 
   const handleDownload = () => {
     window.open(

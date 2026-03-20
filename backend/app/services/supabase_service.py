@@ -244,6 +244,9 @@ class SupabaseService:
     def upsert_setting(self, key: str, value: str) -> None:
         self.db.table("settings").upsert({"key": key, "value": value}).execute()
 
+    def delete_setting(self, key: str) -> None:
+        self.db.table("settings").delete().eq("key", key).execute()
+
     # Dashboard stats
     def get_dashboard_stats(self) -> Dict:
         msg_res = self.db.table("messages").select("id, is_read", count="exact").execute()
