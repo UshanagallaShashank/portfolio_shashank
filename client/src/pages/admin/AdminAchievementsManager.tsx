@@ -77,6 +77,9 @@ function AchievementsTab() {
       ))
       invalidateCache('achievements')
       setVisibilityTarget(null)
+    } catch {
+      setSnack({ msg: 'Failed to update visibility. Is the backend running and Supabase connected?', severity: 'error' })
+      setVisibilityTarget(null)
     } finally {
       setToggling(false)
     }
@@ -288,6 +291,9 @@ function CertificationsTab() {
         x.id === visibilityTarget.id ? { ...x, is_visible: !visibilityTarget.is_visible } : x
       ))
       invalidateCache('certifications')
+      setVisibilityTarget(null)
+    } catch {
+      setSnack({ msg: 'Failed to update visibility. Is the backend running and Supabase connected?', severity: 'error' })
       setVisibilityTarget(null)
     } finally {
       setToggling(false)

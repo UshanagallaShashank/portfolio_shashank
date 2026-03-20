@@ -6,6 +6,8 @@ import GitHubIcon from '@mui/icons-material/GitHub'
 import { useApiCache } from '../../../hooks/useApiCache'
 import { fetchStats } from '../../../api/stats'
 import type { Stat } from '../../../api/stats'
+import { fetchProfile } from '../../../api/profile'
+import type { ProfileSettings } from '../../../api/profile'
 import LinkedInIcon from '@mui/icons-material/LinkedIn'
 import TypewriterText from '../../ui/TypewriterText'
 import { PERSONAL } from '../../../constants/personal'
@@ -13,6 +15,8 @@ import { staggerContainer, fadeInLeft, fadeInRight, fadeInUp } from '../../../ut
 
 export default function HeroSection() {
   const { data: stats } = useApiCache<Stat[]>('stats', fetchStats)
+  const { data: profile } = useApiCache<ProfileSettings>('profile', fetchProfile)
+  const avatarUrl = profile?.avatar_url ?? PERSONAL.avatarUrl
 
   const handleDownload = () => {
     window.open(
@@ -75,30 +79,14 @@ export default function HeroSection() {
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: { xs: 4, md: 8 },
-            flexDirection: { xs: 'column-reverse', md: 'row' },
+            gap: { xs: 3, md: 8 },
+            flexDirection: { xs: 'column', md: 'row' },
+            pt: { xs: 2, md: 0 },
           }}
         >
           {/* Text content */}
-          <Box component={motion.div} variants={fadeInLeft} sx={{ flex: 1, maxWidth: { md: 600 } }}>
-            <motion.div variants={fadeInUp}>
-              <Box sx={{
-                display: 'inline-flex', alignItems: 'center', gap: 1,
-                px: 2, py: 0.5, borderRadius: 5,
-                background: 'rgba(0,180,216,0.1)', border: '1px solid rgba(0,180,216,0.3)',
-                mb: 3,
-              }}>
-                <Box sx={{ width: 8, height: 8, borderRadius: '50%', background: '#00B4D8', boxShadow: '0 0 8px #00B4D8' }}>
-                  <motion.div
-                    animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    style={{ width: '100%', height: '100%', borderRadius: '50%', background: '#00B4D8' }}
-                  />
-                </Box>
-                <Typography sx={{ color: '#00B4D8', fontSize: '0.8rem', fontWeight: 500 }}>
-                  Available for opportunities
-                </Typography>
-              </Box>
+          <Box component={motion.div} variants={fadeInLeft} sx={{ flex: 1, maxWidth: { md: 600 }, width: '100%' }}>
+            <motion.div variants={fadeInUp} style={{ marginBottom: 20 }}>
             </motion.div>
 
             <Typography
@@ -205,7 +193,7 @@ export default function HeroSection() {
           </Box>
 
           {/* Avatar side */}
-          <Box component={motion.div} variants={fadeInRight} sx={{ flexShrink: 0 }}>
+          <Box component={motion.div} variants={fadeInRight} sx={{ flexShrink: 0, display: 'flex', justifyContent: 'center' }}>
             <motion.div
               animate={{ y: [0, -15, 0] }}
               transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
@@ -224,7 +212,7 @@ export default function HeroSection() {
                 />
                 <Box sx={{ position: 'relative', zIndex: 1, p: 0.5, borderRadius: '50%', background: '#0A0E1A' }}>
                   <Avatar
-                    src={PERSONAL.avatarUrl}
+                    src={avatarUrl}
                     alt={PERSONAL.name}
                     sx={{
                       width: { xs: 200, md: 280 },

@@ -77,6 +77,9 @@ export default function AdminStatsManager() {
         x.id === visibilityTarget.id ? { ...x, is_visible: !visibilityTarget.is_visible } : x
       ))
       setVisibilityTarget(null)
+    } catch {
+      setSnack({ msg: 'Failed to update visibility. Is the backend running and Supabase connected?', severity: 'error' })
+      setVisibilityTarget(null)
     } finally {
       setToggling(false)
     }
