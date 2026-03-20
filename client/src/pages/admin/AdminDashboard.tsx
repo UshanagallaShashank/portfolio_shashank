@@ -22,6 +22,8 @@ import { useAuth } from '../../hooks/useAuth'
 import { fetchDashboardStats } from '../../api/admin'
 import type { DashboardStats } from '../../api/admin'
 import GlassCard from '../../components/ui/GlassCard'
+import ThemeToggle from '../../components/ui/ThemeToggle'
+import { useTheme as useAppTheme } from '../../context/ThemeContext'
 import AdminMessagesViewer from './AdminMessagesViewer'
 import AdminProjectsManager from './AdminProjectsManager'
 import AdminSkillsManager from './AdminSkillsManager'
@@ -71,7 +73,7 @@ function DashboardHome() {
   return (
     <Box>
       <Box sx={{ mb: 5 }}>
-        <Typography variant="h4" fontWeight={800} color="#E2E8F0">Overview</Typography>
+        <Typography variant="h4" fontWeight={800} color="text.primary">Overview</Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
           Your portfolio at a glance.
         </Typography>
@@ -103,6 +105,7 @@ function DrawerContent({ user, onClose, onLogout }: {
   onClose: () => void
   onLogout: () => void
 }) {
+  const { isDark } = useAppTheme()
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Logo */}
@@ -128,11 +131,11 @@ function DrawerContent({ user, onClose, onLogout }: {
         </Box>
       </Box>
 
-      <Divider sx={{ borderColor: 'rgba(0,180,216,0.08)', mx: 2 }} />
+      <Divider sx={{ borderColor: isDark ? 'rgba(0,180,216,0.08)' : 'rgba(0,150,183,0.12)', mx: 2 }} />
 
       {/* Nav */}
       <List sx={{ flex: 1, pt: 1.5, px: 1 }}>
-        <Typography variant="overline" sx={{ px: 1.5, color: '#334155', fontSize: 10, letterSpacing: 1.5 }}>
+        <Typography variant="overline" sx={{ px: 1.5, color: 'text.secondary', fontSize: 10, letterSpacing: 1.5 }}>
           Navigation
         </Typography>
         {navItems.map((item) => (
@@ -144,13 +147,16 @@ function DrawerContent({ user, onClose, onLogout }: {
             onClick={onClose}
             sx={{
               borderRadius: 2, mb: 0.5, mt: 0.5, py: 1,
-              color: '#64748B',
+              color: 'text.secondary',
               '&.active': {
                 bgcolor: 'rgba(0,180,216,0.1)',
                 color: '#00B4D8',
                 '& .MuiListItemIcon-root': { color: '#00B4D8' },
               },
-              '&:hover:not(.active)': { bgcolor: 'rgba(255,255,255,0.04)', color: '#94A3B8' },
+              '&:hover:not(.active)': {
+                bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+                color: 'text.primary',
+              },
             }}
           >
             <ListItemIcon sx={{ minWidth: 32, color: 'inherit' }}>{item.icon}</ListItemIcon>
@@ -162,7 +168,7 @@ function DrawerContent({ user, onClose, onLogout }: {
         ))}
       </List>
 
-      <Divider sx={{ borderColor: 'rgba(0,180,216,0.08)', mx: 2 }} />
+      <Divider sx={{ borderColor: isDark ? 'rgba(0,180,216,0.08)' : 'rgba(0,150,183,0.12)', mx: 2 }} />
 
       {/* Bottom */}
       <Box sx={{ p: 2 }}>
@@ -174,7 +180,7 @@ function DrawerContent({ user, onClose, onLogout }: {
             target="_blank"
             endIcon={<OpenInNewIcon sx={{ fontSize: '14px !important' }} />}
             sx={{
-              justifyContent: 'flex-start', textTransform: 'none', color: '#475569',
+              justifyContent: 'flex-start', textTransform: 'none', color: 'text.secondary',
               fontSize: 13, mb: 1,
               '&:hover': { color: '#00B4D8', bgcolor: 'rgba(0,180,216,0.06)' },
             }}
@@ -185,7 +191,9 @@ function DrawerContent({ user, onClose, onLogout }: {
 
         <Box sx={{
           display: 'flex', alignItems: 'center', gap: 1.5, p: 1.5,
-          borderRadius: 2, bgcolor: 'rgba(255,255,255,0.03)', mb: 1,
+          borderRadius: 2,
+          bgcolor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
+          mb: 1,
         }}>
           <Avatar sx={{ width: 30, height: 30, fontSize: 13, bgcolor: 'rgba(0,180,216,0.2)', color: '#00B4D8' }}>
             {user?.email?.[0]?.toUpperCase() ?? 'A'}
@@ -201,7 +209,7 @@ function DrawerContent({ user, onClose, onLogout }: {
           onClick={onLogout}
           sx={{
             justifyContent: 'flex-start', textTransform: 'none',
-            color: '#475569', fontSize: 13,
+            color: 'text.secondary', fontSize: 13,
             '&:hover': { color: '#EF4444', bgcolor: 'rgba(239,68,68,0.06)' },
           }}
         >
@@ -217,6 +225,7 @@ export default function AdminDashboard() {
   const navigate = useNavigate()
   const location = useLocation()
   const theme = useTheme()
+  const { isDark } = useAppTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const [drawerOpen, setDrawerOpen] = useState(false)
 
@@ -239,11 +248,17 @@ export default function AdminDashboard() {
   )
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#080D1A' }}>
+    <Box sx={{
+      display: 'flex',
+      minHeight: '100vh',
+      // transparent — GlobalBackground shows through
+      bgcolor: 'transparent',
+    }}>
       {/* Mobile top bar */}
       {isMobile && (
         <AppBar position="fixed" elevation={0} sx={{
-          bgcolor: '#0A0F1E',
+          bgcolor: isDark ? 'rgba(10,15,30,0.9)' : 'rgba(240,247,255,0.9)',
+          backdropFilter: 'blur(20px)',
           borderBottom: '1px solid rgba(0,180,216,0.1)',
           zIndex: theme.zIndex.drawer + 1,
         }}>
@@ -251,7 +266,7 @@ export default function AdminDashboard() {
             <IconButton
               edge="start"
               onClick={() => setDrawerOpen(true)}
-              sx={{ color: '#94A3B8' }}
+              sx={{ color: 'text.secondary' }}
             >
               <MenuIcon />
             </IconButton>
@@ -265,10 +280,11 @@ export default function AdminDashboard() {
             <Typography fontWeight={700} sx={{
               background: 'linear-gradient(135deg, #00B4D8, #7C3AED)',
               WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
-              fontSize: 14,
+              fontSize: 14, flex: 1,
             }}>
               {currentNav?.label ?? 'Admin'}
             </Typography>
+            <ThemeToggle />
           </Toolbar>
         </AppBar>
       )}
@@ -285,11 +301,18 @@ export default function AdminDashboard() {
           '& .MuiDrawer-paper': {
             width: DRAWER_WIDTH,
             boxSizing: 'border-box',
-            bgcolor: '#0A0F1E',
-            borderRight: '1px solid rgba(0,180,216,0.1)',
+            bgcolor: isDark ? 'rgba(10,15,30,0.95)' : 'rgba(255,255,255,0.92)',
+            backdropFilter: 'blur(20px)',
+            borderRight: isDark ? '1px solid rgba(0,180,216,0.1)' : '1px solid rgba(0,150,183,0.12)',
           },
         }}
       >
+        {/* Theme toggle at top of desktop drawer */}
+        {!isMobile && (
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', px: 1.5, pt: 1.5 }}>
+            <ThemeToggle />
+          </Box>
+        )}
         {drawerContent}
       </Drawer>
 

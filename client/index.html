@@ -4,7 +4,28 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>client</title>
+    <title>Shashank · Portfolio</title>
+    <style>
+      /* Prevent flash of white before React hydrates */
+      html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #060A14;
+      }
+      /* Apply saved theme immediately */
+      html[data-theme="light"], body[data-theme="light"] {
+        background-color: #EFF6FF;
+      }
+    </style>
+    <script>
+      // Apply theme class before React mounts to prevent FOUC
+      try {
+        var t = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.style.backgroundColor = t === 'light' ? '#EFF6FF' : '#060A14';
+        document.body && (document.body.style.backgroundColor = t === 'light' ? '#EFF6FF' : '#060A14');
+      } catch(e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

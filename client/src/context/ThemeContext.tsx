@@ -28,11 +28,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     localStorage.setItem('theme', mode)
     document.documentElement.setAttribute('data-theme', mode)
-    if (mode === 'dark') {
-      document.body.style.backgroundColor = '#0A0E1A'
-    } else {
-      document.body.style.backgroundColor = '#F0F7FF'
-    }
+    // Set both html and body background to prevent flash of white on load
+    // and ensure GlobalBackground's fixed layer always has a base behind it
+    const bg = mode === 'dark' ? '#060A14' : '#EFF6FF'
+    document.documentElement.style.backgroundColor = bg
+    document.body.style.backgroundColor = bg
   }, [mode])
 
   const toggleTheme = () => {
