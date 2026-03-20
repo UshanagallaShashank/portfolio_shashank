@@ -38,7 +38,7 @@ export default function AchievementsPage() {
         <Box ref={ref}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
             <EmojiEventsIcon sx={{ color: '#F59E0B' }} />
-            <Typography variant="h5" fontWeight={700} sx={{ color: '#E2E8F0' }}>Competitive Programming</Typography>
+            <Typography variant="h5" fontWeight={700} sx={{ color: 'text.primary' }}>Competitive Programming</Typography>
           </Box>
           <Box
             component={motion.div}
@@ -70,7 +70,7 @@ export default function AchievementsPage() {
         {/* Certifications */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 3 }}>
           <WorkspacePremiumIcon sx={{ color: '#00B4D8' }} />
-          <Typography variant="h5" fontWeight={700} sx={{ color: '#E2E8F0' }}>Certifications</Typography>
+          <Typography variant="h5" fontWeight={700} sx={{ color: 'text.primary' }}>Certifications</Typography>
         </Box>
         <Grid container spacing={3}>
           {certifications.map((cert, i) => (
@@ -79,7 +79,7 @@ export default function AchievementsPage() {
                 <GlassCard sx={{ p: 3 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <Box>
-                      <Typography variant="h6" fontWeight={700} sx={{ color: '#E2E8F0', mb: 0.5 }}>
+                      <Typography variant="h6" fontWeight={700} sx={{ color: 'text.primary', mb: 0.5 }}>
                         {cert.title}
                       </Typography>
                       <Typography variant="body2" sx={{ color: '#00B4D8', fontWeight: 500 }}>
@@ -103,7 +103,7 @@ export default function AchievementsPage() {
 
         <Box sx={{ mt: 6, textAlign: 'center' }}>
           <GlassCard sx={{ p: 4, display: 'inline-block' }}>
-            <Typography variant="h6" fontWeight={700} sx={{ color: '#E2E8F0', mb: 1 }}>LeetCode Profile</Typography>
+            <Typography variant="h6" fontWeight={700} sx={{ color: 'text.primary', mb: 1 }}>LeetCode Profile</Typography>
             <Typography color="text.secondary" sx={{ mb: 2 }}>
               Check out my competitive programming journey
             </Typography>

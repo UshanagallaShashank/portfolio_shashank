@@ -7,9 +7,9 @@ import {
 import MenuIcon from '@mui/icons-material/Menu'
 import CloseIcon from '@mui/icons-material/Close'
 import { motion, AnimatePresence } from 'framer-motion'
-import ThemeToggle from '../ui/ThemeToggle'
 import { NAV_LINKS } from '../../constants/navigation'
 import { PERSONAL } from '../../constants/personal'
+import ThemeToggle from '../ui/ThemeToggle'
 import { useTheme } from '../../context/ThemeContext'
 
 export default function Navbar() {
@@ -17,8 +17,8 @@ export default function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const muiTheme = useMuiTheme()
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'))
-  const { isDark } = useTheme()
   const location = useLocation()
+  const { isDark } = useTheme()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -30,9 +30,9 @@ export default function Navbar() {
     setDrawerOpen(false)
   }, [location])
 
-  const navBg = isDark
-    ? scrolled ? 'rgba(10,14,26,0.95)' : 'transparent'
-    : scrolled ? 'rgba(240,247,255,0.95)' : 'transparent'
+  const navBg = scrolled
+    ? isDark ? 'rgba(10,14,26,0.95)' : 'rgba(240,247,255,0.95)'
+    : 'transparent'
 
   return (
     <>
@@ -50,16 +50,28 @@ export default function Navbar() {
         <Toolbar sx={{ maxWidth: 1200, mx: 'auto', width: '100%', px: { xs: 2, md: 4 }, height: 70 }}>
           <NavLink to="/" style={{ textDecoration: 'none', flexGrow: 0 }}>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Box sx={{
-                fontWeight: 800,
-                fontSize: '1.3rem',
-                background: 'linear-gradient(135deg, #00B4D8, #7C3AED)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                letterSpacing: '-0.02em',
-              }}>
-                {PERSONAL.firstName}
-                <Box component="span" sx={{ color: '#00B4D8', WebkitTextFillColor: '#00B4D8' }}>.</Box>
+              <Box sx={{ lineHeight: 1.1 }}>
+                <Box sx={{
+                  fontWeight: 800,
+                  fontSize: '0.7rem',
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  color: 'text.secondary',
+                  opacity: 0.7,
+                }}>
+                  Ushanagalla
+                </Box>
+                <Box sx={{
+                  fontWeight: 800,
+                  fontSize: '1.15rem',
+                  background: 'linear-gradient(135deg, #00B4D8, #7C3AED)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  letterSpacing: '-0.02em',
+                }}>
+                  {PERSONAL.firstName}
+                  <Box component="span" sx={{ color: '#00B4D8', WebkitTextFillColor: '#00B4D8' }}>.</Box>
+                </Box>
               </Box>
             </motion.div>
           </NavLink>
@@ -78,7 +90,7 @@ export default function Navbar() {
                         px: 1.5, py: 0.75, borderRadius: 2,
                         fontSize: '0.875rem',
                         fontWeight: isActive ? 600 : 400,
-                        color: isActive ? '#00B4D8' : (isDark ? '#94A3B8' : '#475569'),
+                        color: isActive ? '#00B4D8' : 'text.secondary',
                         background: isActive ? 'rgba(0,180,216,0.1)' : 'transparent',
                         border: isActive ? '1px solid rgba(0,180,216,0.3)' : '1px solid transparent',
                         cursor: 'pointer',
@@ -91,7 +103,9 @@ export default function Navbar() {
                   )}
                 </NavLink>
               ))}
-              <Box sx={{ ml: 1 }}><ThemeToggle /></Box>
+              <Box sx={{ ml: 1 }}>
+                <ThemeToggle />
+              </Box>
             </Box>
           )}
 
@@ -138,7 +152,7 @@ export default function Navbar() {
                       <ListItemButton
                         sx={{
                           mx: 1, borderRadius: 2,
-                          color: isActive ? '#00B4D8' : (isDark ? '#94A3B8' : '#475569'),
+                          color: isActive ? '#00B4D8' : 'text.secondary',
                           background: isActive ? 'rgba(0,180,216,0.1)' : 'transparent',
                         }}
                       >

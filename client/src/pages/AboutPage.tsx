@@ -7,9 +7,14 @@ import GlassCard from '../components/ui/GlassCard'
 import PageWrapper from '../components/layout/PageWrapper'
 import { PERSONAL } from '../constants/personal'
 import { fadeInLeft, fadeInRight } from '../utils/animationVariants'
+import { useApiCache } from '../hooks/useApiCache'
+import { fetchProfile } from '../api/profile'
+import type { ProfileSettings } from '../api/profile'
 
 export default function AboutPage() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 })
+  const { data: profile } = useApiCache<ProfileSettings>('profile', fetchProfile)
+  const avatarUrl = profile?.about_avatar_url ?? profile?.avatar_url ?? PERSONAL.avatarUrl
 
   return (
     <PageWrapper>
@@ -31,7 +36,7 @@ export default function AboutPage() {
                     filter: 'blur(20px)',
                   }} />
                   <Avatar
-                    src={PERSONAL.avatarUrl}
+                    src={avatarUrl}
                     alt={PERSONAL.name}
                     sx={{ width: 280, height: 280, borderRadius: 4, position: 'relative', zIndex: 1 }}
                     variant="rounded"
@@ -43,7 +48,10 @@ export default function AboutPage() {
 
           <Grid size={{ xs: 12, md: 7 }}>
             <motion.div variants={fadeInRight} initial="hidden" animate={inView ? 'visible' : 'hidden'}>
-              <Typography variant="h4" fontWeight={700} sx={{ mb: 2, color: '#E2E8F0' }}>
+              <Typography variant="h4" fontWeight={800} sx={{ mb: 0.5, color: 'text.primary', letterSpacing: '-0.02em' }}>
+                {PERSONAL.name}
+              </Typography>
+              <Typography variant="h6" fontWeight={500} sx={{ mb: 2 }}>
                 Full-Stack Developer &{' '}
                 <Box component="span" sx={{ background: 'linear-gradient(135deg, #00B4D8, #7C3AED)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
                   AI Engineer
@@ -63,7 +71,7 @@ export default function AboutPage() {
                     <Typography variant="caption" color="text.secondary" sx={{ textTransform: 'uppercase', letterSpacing: 1 }}>
                       {item.label}
                     </Typography>
-                    <Typography variant="body2" fontWeight={600} sx={{ color: '#E2E8F0', mt: 0.5, wordBreak: 'break-all' }}>
+                    <Typography variant="body2" fontWeight={600} sx={{ color: 'text.primary', mt: 0.5, wordBreak: 'break-all' }}>
                       {item.value}
                     </Typography>
                   </GlassCard>

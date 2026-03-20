@@ -6,13 +6,19 @@ import GitHubIcon from '@mui/icons-material/GitHub'
 import { useApiCache } from '../../../hooks/useApiCache'
 import { fetchStats } from '../../../api/stats'
 import type { Stat } from '../../../api/stats'
+import { fetchProfile } from '../../../api/profile'
+import type { ProfileSettings } from '../../../api/profile'
 import LinkedInIcon from '@mui/icons-material/LinkedIn'
 import TypewriterText from '../../ui/TypewriterText'
 import { PERSONAL } from '../../../constants/personal'
 import { staggerContainer, fadeInLeft, fadeInRight, fadeInUp } from '../../../utils/animationVariants'
+import { useTheme } from '../../../context/ThemeContext'
 
 export default function HeroSection() {
   const { data: stats } = useApiCache<Stat[]>('stats', fetchStats)
+  const { data: profile } = useApiCache<ProfileSettings>('profile', fetchProfile)
+  const avatarUrl = profile?.hero_avatar_url ?? profile?.avatar_url ?? PERSONAL.avatarUrl
+  const { isDark } = useTheme()
 
   const handleDownload = () => {
     window.open(
@@ -29,7 +35,10 @@ export default function HeroSection() {
         alignItems: 'center',
         position: 'relative',
         overflow: 'hidden',
-        background: 'linear-gradient(135deg, #0A0E1A 0%, #0F1629 50%, #141c30 100%)',
+        // Dark mode keeps its own deep gradient; light mode is transparent so GlobalBackground shows through
+        background: isDark
+          ? 'linear-gradient(135deg, #0A0E1A 0%, #0F1629 50%, #141c30 100%)'
+          : 'transparent',
       }}
     >
       {/* Animated background orbs */}
@@ -75,18 +84,18 @@ export default function HeroSection() {
           sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: { xs: 4, md: 8 },
-            flexDirection: { xs: 'column-reverse', md: 'row' },
+            gap: { xs: 3, md: 8 },
+            flexDirection: { xs: 'column', md: 'row' },
+            pt: { xs: 2, md: 0 },
           }}
         >
           {/* Text content */}
-          <Box component={motion.div} variants={fadeInLeft} sx={{ flex: 1, maxWidth: { md: 600 } }}>
-            <motion.div variants={fadeInUp}>
+          <Box component={motion.div} variants={fadeInLeft} sx={{ flex: 1, maxWidth: { md: 600 }, width: '100%' }}>
+            <motion.div variants={fadeInUp} style={{ marginBottom: 20 }}>
               <Box sx={{
                 display: 'inline-flex', alignItems: 'center', gap: 1,
-                px: 2, py: 0.5, borderRadius: 5,
+                px: 2, py: 0.75, borderRadius: 5,
                 background: 'rgba(0,180,216,0.1)', border: '1px solid rgba(0,180,216,0.3)',
-                mb: 3,
               }}>
                 <Box sx={{ width: 8, height: 8, borderRadius: '50%', background: '#00B4D8', boxShadow: '0 0 8px #00B4D8' }}>
                   <motion.div
@@ -105,10 +114,10 @@ export default function HeroSection() {
               variant="h1"
               sx={{
                 fontWeight: 900,
-                fontSize: { xs: '2.4rem', sm: '3rem', md: '3.8rem' },
+                fontSize: { xs: '2rem', sm: '2.6rem', md: '3.2rem' },
                 lineHeight: 1.1,
                 letterSpacing: '-0.03em',
-                color: '#E2E8F0',
+                color: 'text.primary',
                 mb: 1,
               }}
             >
@@ -118,7 +127,7 @@ export default function HeroSection() {
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}>
-                {PERSONAL.firstName}
+                {PERSONAL.name}
               </Box>
             </Typography>
 
@@ -131,7 +140,7 @@ export default function HeroSection() {
 
             <Typography
               variant="body1"
-              sx={{ color: '#94A3B8', lineHeight: 1.8, mb: 4, fontSize: { xs: '0.95rem', md: '1.05rem' } }}
+              sx={{ color: 'text.secondary', lineHeight: 1.8, mb: 4, fontSize: { xs: '0.95rem', md: '1.05rem' } }}
             >
               {PERSONAL.bio}
             </Typography>
@@ -180,7 +189,7 @@ export default function HeroSection() {
               </motion.div>
             </Stack>
 
-            <Stack direction="row" spacing={1}>
+            <Stack direction="row" spacing={1} sx={{ mb: 3 }}>
               {[
                 { icon: <GitHubIcon />, href: PERSONAL.github, label: 'GitHub' },
                 { icon: <LinkedInIcon />, href: PERSONAL.linkedin, label: 'LinkedIn' },
@@ -190,8 +199,9 @@ export default function HeroSection() {
                     <IconButton
                       component="a" href={s.href} target="_blank" rel="noopener noreferrer"
                       sx={{
-                        color: '#94A3B8',
-                        border: '1px solid rgba(148,163,184,0.2)',
+                        color: 'text.secondary',
+                        border: '1px solid',
+                        borderColor: 'divider',
                         borderRadius: 2,
                         '&:hover': { color: '#00B4D8', borderColor: 'rgba(0,180,216,0.4)', background: 'rgba(0,180,216,0.08)' },
                       }}
@@ -202,10 +212,45 @@ export default function HeroSection() {
                 </Tooltip>
               ))}
             </Stack>
+
+            {/* Tech stack pills */}
+            <Box>
+              <Typography variant="caption" color="text.secondary" sx={{ letterSpacing: 1.5, textTransform: 'uppercase', fontSize: 10, mb: 1.5, display: 'block' }}>
+                Tech Stack
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {[
+                  { label: 'Python', icon: '🐍' },
+                  { label: 'FastAPI', icon: '⚡' },
+                  { label: 'React', icon: '⚛️' },
+                  { label: 'LangGraph', icon: '📊' },
+                  { label: 'RAG', icon: '🧠' },
+                  { label: 'WebRTC', icon: '📡' },
+                  { label: 'TypeScript', icon: '📘' },
+                  { label: 'Supabase', icon: '🟢' },
+                ].map((tech) => (
+                  <Box
+                    key={tech.label}
+                    sx={{
+                      display: 'inline-flex', alignItems: 'center', gap: 0.5,
+                      px: 1.5, py: 0.4, borderRadius: 2,
+                      bgcolor: isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.04)',
+                      border: '1px solid',
+                      borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)',
+                      fontSize: 12, color: 'text.secondary', fontWeight: 500,
+                      transition: 'all 0.2s',
+                      '&:hover': { borderColor: 'rgba(0,180,216,0.35)', color: 'text.primary', bgcolor: 'rgba(0,180,216,0.06)' },
+                    }}
+                  >
+                    <span style={{ fontSize: 13 }}>{tech.icon}</span> {tech.label}
+                  </Box>
+                ))}
+              </Box>
+            </Box>
           </Box>
 
           {/* Avatar side */}
-          <Box component={motion.div} variants={fadeInRight} sx={{ flexShrink: 0 }}>
+          <Box component={motion.div} variants={fadeInRight} sx={{ flexShrink: 0, display: 'flex', justifyContent: 'center' }}>
             <motion.div
               animate={{ y: [0, -15, 0] }}
               transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
@@ -222,27 +267,29 @@ export default function HeroSection() {
                     zIndex: 0,
                   }}
                 />
-                <Box sx={{ position: 'relative', zIndex: 1, p: 0.5, borderRadius: '50%', background: '#0A0E1A' }}>
+                <Box sx={{ position: 'relative', zIndex: 1, p: 0.5, borderRadius: '50%', background: isDark ? '#0A0E1A' : '#F0F7FF' }}>
                   <Avatar
-                    src={PERSONAL.avatarUrl}
+                    src={avatarUrl}
                     alt={PERSONAL.name}
                     sx={{
                       width: { xs: 200, md: 280 },
                       height: { xs: 200, md: 280 },
-                      border: '4px solid #0A0E1A',
+                      border: isDark ? '4px solid #0A0E1A' : '4px solid #F0F7FF',
                     }}
                   />
                 </Box>
                 {/* Status badge */}
                 <Box sx={{
                   position: 'absolute', bottom: 8, right: 8, zIndex: 2,
-                  background: '#141c30', border: '2px solid rgba(0,180,216,0.4)',
+                  background: isDark ? '#141c30' : '#ffffff',
+                  border: '2px solid rgba(0,180,216,0.4)',
                   borderRadius: 2, px: 1.5, py: 0.5,
                   display: 'flex', alignItems: 'center', gap: 0.5,
                 }}>
                   <Box sx={{ width: 8, height: 8, borderRadius: '50%', background: '#10B981', boxShadow: '0 0 8px #10B981' }} />
-                  <Typography sx={{ fontSize: '0.72rem', color: '#94A3B8', fontWeight: 500 }}>Open to work</Typography>
+                  <Typography sx={{ fontSize: '0.72rem', color: 'text.secondary', fontWeight: 500 }}>Open to work</Typography>
                 </Box>
+
               </Box>
             </motion.div>
           </Box>

@@ -130,13 +130,17 @@ export const lightMuiTheme = createTheme({
       light: tokens.colors.accentLight,
     },
     background: {
-      default: tokens.colors.lightBg,
-      paper: tokens.colors.lightBgCard,
+      default: 'transparent',   // GlobalBackground handles the real bg
+      paper: 'rgba(255,255,255,0.75)',
     },
     text: {
       primary: tokens.colors.lightTextPrimary,
       secondary: tokens.colors.lightTextSecondary,
     },
+    success: { main: tokens.colors.success },
+    warning: { main: tokens.colors.warning },
+    error: { main: tokens.colors.error },
+    divider: 'rgba(0, 150, 183, 0.12)',
   },
   components: {
     MuiButton: {
@@ -158,6 +162,39 @@ export const lightMuiTheme = createTheme({
             boxShadow: '0 8px 32px rgba(0,150,183,0.2)',
             borderColor: 'rgba(0,150,183,0.4)',
           },
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: '#0096B7',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              borderColor: '#0096B7',
+            },
+          },
+        },
+      },
+    },
+    MuiLinearProgress: {
+      styleOverrides: {
+        root: {
+          borderRadius: 4,
+          backgroundColor: alpha('#0096B7', 0.12),
+        },
+        bar: {
+          background: 'linear-gradient(90deg, #0096B7, #7C3AED)',
+          borderRadius: 4,
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          borderRadius: 6,
         },
       },
     },

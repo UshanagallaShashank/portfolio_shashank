@@ -1,20 +1,35 @@
-import { Box, Typography, Chip } from '@mui/material'
+import { useEffect, useState } from 'react'
+import { Box, Typography, Chip, CircularProgress } from '@mui/material'
 import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineContent, TimelineDot, TimelineOppositeContent } from '@mui/lab'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import WorkIcon from '@mui/icons-material/Work'
 import SchoolIcon from '@mui/icons-material/School'
 import GlassCard from '../../ui/GlassCard'
-import { EXPERIENCE } from '../../../constants/personal'
+import { fetchExperience, type Experience } from '../../../api/experience'
 
 export default function ExperienceSection() {
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 })
+  const [items, setItems] = useState<Experience[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchExperience().then(setItems).finally(() => setLoading(false))
+  }, [])
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+        <CircularProgress sx={{ color: '#00B4D8' }} />
+      </Box>
+    )
+  }
 
   return (
     <Box ref={ref}>
       <Timeline position="alternate" sx={{ px: 0 }}>
-        {EXPERIENCE.map((exp, i) => (
-          <TimelineItem key={i}>
+        {items.map((exp, i) => (
+          <TimelineItem key={exp.id}>
             <TimelineOppositeContent sx={{ m: 'auto 0', display: { xs: 'none', md: 'block' } }}>
               <motion.div
                 initial={{ opacity: 0, x: i % 2 === 0 ? -30 : 30 }}
@@ -50,7 +65,7 @@ export default function ExperienceSection() {
               >
                 {exp.type === 'Part-time' ? <SchoolIcon sx={{ fontSize: 16 }} /> : <WorkIcon sx={{ fontSize: 16 }} />}
               </TimelineDot>
-              {i < EXPERIENCE.length - 1 && (
+              {i < items.length - 1 && (
                 <TimelineConnector sx={{ background: 'linear-gradient(180deg, #00B4D8, rgba(0,180,216,0.2))' }} />
               )}
             </TimelineSeparator>
@@ -65,7 +80,7 @@ export default function ExperienceSection() {
                   <Box sx={{ display: { xs: 'block', md: 'none' }, mb: 1 }}>
                     <Typography variant="caption" color="text.secondary">{exp.period}</Typography>
                   </Box>
-                  <Typography variant="h6" fontWeight={700} sx={{ color: '#E2E8F0', mb: 0.5 }}>
+                  <Typography variant="h6" fontWeight={700} sx={{ color: 'text.primary', mb: 0.5 }}>
                     {exp.role}
                   </Typography>
                   <Typography
@@ -85,7 +100,7 @@ export default function ExperienceSection() {
                       <Box
                         key={j}
                         component="li"
-                        sx={{ color: '#94A3B8', fontSize: '0.875rem', lineHeight: 1.7, mb: 0.5, textAlign: 'left' }}
+                        sx={{ color: 'text.secondary', fontSize: '0.875rem', lineHeight: 1.7, mb: 0.5, textAlign: 'left' }}
                       >
                         {h}
                       </Box>
@@ -112,6 +127,12 @@ export default function ExperienceSection() {
           </TimelineItem>
         ))}
       </Timeline>
+
+      {items.length === 0 && (
+        <Typography color="text.secondary" sx={{ textAlign: 'center', py: 8 }}>
+          No experience entries yet.
+        </Typography>
+      )}
     </Box>
   )
 }

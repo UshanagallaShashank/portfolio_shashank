@@ -43,7 +43,7 @@ export default function ProjectsPage() {
           sx={{
             mb: 4,
             '& .MuiTabs-indicator': { background: 'linear-gradient(90deg, #00B4D8, #7C3AED)', height: 3, borderRadius: 2 },
-            '& .MuiTab-root': { color: '#64748B', textTransform: 'none', fontWeight: 500, '&.Mui-selected': { color: '#00B4D8', fontWeight: 600 } },
+            '& .MuiTab-root': { color: 'text.secondary', textTransform: 'none', fontWeight: 500, '&.Mui-selected': { color: '#00B4D8', fontWeight: 600 } },
           }}
         >
           <Tab label="Featured Projects" value="featured" />

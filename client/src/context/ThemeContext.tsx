@@ -28,11 +28,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     localStorage.setItem('theme', mode)
     document.documentElement.setAttribute('data-theme', mode)
-    if (mode === 'dark') {
-      document.body.style.backgroundColor = '#0A0E1A'
-    } else {
-      document.body.style.backgroundColor = '#F0F7FF'
-    }
+    // Set solid base colours so GlobalBackground's fixed layer has a canvas behind it
+    const bg = mode === 'dark' ? '#060A14' : '#EBF5FF'
+    document.documentElement.style.backgroundColor = bg
+    document.body.style.backgroundColor = bg
   }, [mode])
 
   const toggleTheme = () => {
