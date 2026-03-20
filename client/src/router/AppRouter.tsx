@@ -4,7 +4,8 @@ import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
 import ScrollToTop from '../components/layout/ScrollToTop'
 import ProtectedRoute from './ProtectedRoute'
-import LoadingSpinner from '../components/ui/LoadingSpinner'
+import PageLoader from '../components/ui/PageLoader'
+import ScrollDownIndicator from '../components/ui/ScrollDownIndicator'
 
 const HomePage = lazy(() => import('../pages/HomePage'))
 const AboutPage = lazy(() => import('../pages/AboutPage'))
@@ -22,6 +23,7 @@ function PublicLayout() {
       <Navbar />
       <Outlet />
       <Footer />
+      <ScrollDownIndicator />
     </>
   )
 }
@@ -30,7 +32,7 @@ export default function AppRouter() {
   return (
     <BrowserRouter>
       <ScrollToTop />
-      <Suspense fallback={<LoadingSpinner />}>
+      <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route element={<PublicLayout />}>
             <Route path="/" element={<HomePage />} />
