@@ -40,7 +40,7 @@ export default function ContactPage() {
 
   return (
     <PageWrapper>
-      <Container maxWidth="lg" sx={{ py: 8 }}>
+      <Container maxWidth="lg" sx={{ pt: '80px', pb: 8 }}>
         <SectionTitle
           title="Get In Touch"
           subtitle="Have a project in mind or just want to say hi? Fill out the form below."

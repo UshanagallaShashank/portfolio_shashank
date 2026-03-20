@@ -28,7 +28,7 @@ export default function AchievementsPage() {
 
   return (
     <PageWrapper>
-      <Container maxWidth="lg" sx={{ py: 8 }}>
+      <Container maxWidth="lg" sx={{ pt: '80px', pb: 8 }}>
         <SectionTitle
           title="Achievements"
           subtitle="Competitive programming milestones and professional certifications."

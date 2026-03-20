@@ -41,7 +41,7 @@ export default function CollaborationPage() {
 
   return (
     <PageWrapper>
-      <Container maxWidth="lg" sx={{ py: 8 }}>
+      <Container maxWidth="lg" sx={{ pt: '80px', pb: 8 }}>
         <SectionTitle
           title="Collaboration"
           subtitle="Open to freelance projects, consulting, and exciting collaborations."

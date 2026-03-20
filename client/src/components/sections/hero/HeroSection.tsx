@@ -35,6 +35,7 @@ export default function HeroSection() {
         alignItems: 'center',
         position: 'relative',
         overflow: 'hidden',
+        pt: '70px', // offset for fixed navbar
         // Dark mode keeps its own deep gradient; light mode is transparent so GlobalBackground shows through
         background: isDark
           ? 'linear-gradient(135deg, #0A0E1A 0%, #0F1629 50%, #141c30 100%)'

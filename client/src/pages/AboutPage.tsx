@@ -18,7 +18,7 @@ export default function AboutPage() {
 
   return (
     <PageWrapper>
-      <Container maxWidth="lg" sx={{ py: 8 }}>
+      <Container maxWidth="lg" sx={{ pt: '80px', pb: 8 }}>
         <SectionTitle
           title="About Me"
           subtitle="Developer, AI enthusiast, and problem-solver from Hyderabad."
