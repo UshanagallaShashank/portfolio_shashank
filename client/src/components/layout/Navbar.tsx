@@ -50,28 +50,17 @@ export default function Navbar() {
         <Toolbar sx={{ maxWidth: 1200, mx: 'auto', width: '100%', px: { xs: 2, md: 4 }, height: 70 }}>
           <NavLink to="/" style={{ textDecoration: 'none', flexGrow: 0 }}>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Box sx={{ lineHeight: 1.1 }}>
-                <Box sx={{
-                  fontWeight: 800,
-                  fontSize: '0.7rem',
-                  letterSpacing: '0.12em',
-                  textTransform: 'uppercase',
-                  color: 'text.secondary',
-                  opacity: 0.7,
-                }}>
-                  Ushanagalla
-                </Box>
-                <Box sx={{
-                  fontWeight: 800,
-                  fontSize: '1.15rem',
-                  background: 'linear-gradient(135deg, #00B4D8, #7C3AED)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  letterSpacing: '-0.02em',
-                }}>
-                  {PERSONAL.firstName}
-                  <Box component="span" sx={{ color: '#00B4D8', WebkitTextFillColor: '#00B4D8' }}>.</Box>
-                </Box>
+              <Box sx={{
+                fontWeight: 800,
+                fontSize: '1.25rem',
+                background: 'linear-gradient(135deg, #00B4D8, #7C3AED)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                letterSpacing: '-0.02em',
+                whiteSpace: 'nowrap',
+              }}>
+                {PERSONAL.name}
+                <Box component="span" sx={{ color: '#00B4D8', WebkitTextFillColor: '#00B4D8' }}>.</Box>
               </Box>
             </motion.div>
           </NavLink>

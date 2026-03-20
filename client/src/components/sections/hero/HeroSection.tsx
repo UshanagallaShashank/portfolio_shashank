@@ -92,33 +92,17 @@ export default function HeroSection() {
           {/* Text content */}
           <Box component={motion.div} variants={fadeInLeft} sx={{ flex: 1, maxWidth: { md: 600 }, width: '100%' }}>
             <motion.div variants={fadeInUp} style={{ marginBottom: 20 }}>
-              <Box sx={{
-                display: 'inline-flex', alignItems: 'center', gap: 1,
-                px: 2, py: 0.75, borderRadius: 5,
-                background: 'rgba(0,180,216,0.1)', border: '1px solid rgba(0,180,216,0.3)',
-              }}>
-                <Box sx={{ width: 8, height: 8, borderRadius: '50%', background: '#00B4D8', boxShadow: '0 0 8px #00B4D8' }}>
-                  <motion.div
-                    animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    style={{ width: '100%', height: '100%', borderRadius: '50%', background: '#00B4D8' }}
-                  />
-                </Box>
-                <Typography sx={{ color: '#00B4D8', fontSize: '0.8rem', fontWeight: 500 }}>
-                  Available for opportunities
-                </Typography>
-              </Box>
             </motion.div>
 
             <Typography
               variant="h1"
               sx={{
                 fontWeight: 900,
-                fontSize: { xs: '2rem', sm: '2.6rem', md: '3.2rem' },
+                fontSize: { xs: '2.4rem', sm: '3rem', md: '3.8rem' },
                 lineHeight: 1.1,
                 letterSpacing: '-0.03em',
                 color: 'text.primary',
-                mb: 1,
+                mb: 0.5,
               }}
             >
               Hi, I'm{' '}
@@ -127,8 +111,19 @@ export default function HeroSection() {
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}>
-                {PERSONAL.name}
+                {PERSONAL.firstName}
               </Box>
+            </Typography>
+            {/* Full name subtitle — always visible, never wraps into the h1 */}
+            <Typography sx={{
+              fontSize: { xs: '0.9rem', md: '1rem' },
+              color: 'text.secondary',
+              fontWeight: 500,
+              letterSpacing: '0.06em',
+              mb: 1.5,
+              textTransform: 'uppercase',
+            }}>
+              {PERSONAL.name}
             </Typography>
 
             <Box sx={{ mb: 3, height: { xs: 40, md: 50 } }}>
