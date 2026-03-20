@@ -7,17 +7,14 @@ import {
 import MenuIcon from '@mui/icons-material/Menu'
 import CloseIcon from '@mui/icons-material/Close'
 import { motion, AnimatePresence } from 'framer-motion'
-import ThemeToggle from '../ui/ThemeToggle'
 import { NAV_LINKS } from '../../constants/navigation'
 import { PERSONAL } from '../../constants/personal'
-import { useTheme } from '../../context/ThemeContext'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const muiTheme = useMuiTheme()
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'))
-  const { isDark } = useTheme()
   const location = useLocation()
 
   useEffect(() => {
@@ -30,9 +27,7 @@ export default function Navbar() {
     setDrawerOpen(false)
   }, [location])
 
-  const navBg = isDark
-    ? scrolled ? 'rgba(10,14,26,0.95)' : 'transparent'
-    : scrolled ? 'rgba(240,247,255,0.95)' : 'transparent'
+  const navBg = scrolled ? 'rgba(10,14,26,0.95)' : 'transparent'
 
   return (
     <>
@@ -78,7 +73,7 @@ export default function Navbar() {
                         px: 1.5, py: 0.75, borderRadius: 2,
                         fontSize: '0.875rem',
                         fontWeight: isActive ? 600 : 400,
-                        color: isActive ? '#00B4D8' : (isDark ? '#94A3B8' : '#475569'),
+                        color: isActive ? '#00B4D8' : '#94A3B8',
                         background: isActive ? 'rgba(0,180,216,0.1)' : 'transparent',
                         border: isActive ? '1px solid rgba(0,180,216,0.3)' : '1px solid transparent',
                         cursor: 'pointer',
@@ -91,13 +86,11 @@ export default function Navbar() {
                   )}
                 </NavLink>
               ))}
-              <Box sx={{ ml: 1 }}><ThemeToggle /></Box>
             </Box>
           )}
 
           {isMobile && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <ThemeToggle />
               <IconButton onClick={() => setDrawerOpen(true)} sx={{ color: '#00B4D8' }}>
                 <MenuIcon />
               </IconButton>
@@ -113,7 +106,7 @@ export default function Navbar() {
         PaperProps={{
           sx: {
             width: 280,
-            background: isDark ? '#0F1629' : '#F0F7FF',
+            background: '#0F1629',
             borderLeft: '1px solid rgba(0,180,216,0.2)',
           },
         }}
@@ -138,7 +131,7 @@ export default function Navbar() {
                       <ListItemButton
                         sx={{
                           mx: 1, borderRadius: 2,
-                          color: isActive ? '#00B4D8' : (isDark ? '#94A3B8' : '#475569'),
+                          color: isActive ? '#00B4D8' : '#94A3B8',
                           background: isActive ? 'rgba(0,180,216,0.1)' : 'transparent',
                         }}
                       >
