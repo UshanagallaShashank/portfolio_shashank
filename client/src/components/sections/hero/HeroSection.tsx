@@ -184,7 +184,7 @@ export default function HeroSection() {
               </motion.div>
             </Stack>
 
-            <Stack direction="row" spacing={1}>
+            <Stack direction="row" spacing={1} sx={{ mb: 3 }}>
               {[
                 { icon: <GitHubIcon />, href: PERSONAL.github, label: 'GitHub' },
                 { icon: <LinkedInIcon />, href: PERSONAL.linkedin, label: 'LinkedIn' },
@@ -206,6 +206,40 @@ export default function HeroSection() {
                 </Tooltip>
               ))}
             </Stack>
+
+            {/* Tech stack pills */}
+            <Box>
+              <Typography variant="caption" color="text.secondary" sx={{ letterSpacing: 1.5, textTransform: 'uppercase', fontSize: 10, mb: 1.5, display: 'block' }}>
+                Tech Stack
+              </Typography>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {[
+                  { label: 'Python', icon: '🐍' },
+                  { label: 'FastAPI', icon: '⚡' },
+                  { label: 'React', icon: '⚛️' },
+                  { label: 'LangGraph', icon: '📊' },
+                  { label: 'RAG', icon: '🧠' },
+                  { label: 'WebRTC', icon: '📡' },
+                  { label: 'TypeScript', icon: '📘' },
+                  { label: 'Supabase', icon: '🟢' },
+                ].map((tech) => (
+                  <Box
+                    key={tech.label}
+                    sx={{
+                      display: 'inline-flex', alignItems: 'center', gap: 0.5,
+                      px: 1.5, py: 0.4, borderRadius: 2,
+                      bgcolor: 'rgba(255,255,255,0.04)',
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      fontSize: 12, color: '#94A3B8', fontWeight: 500,
+                      transition: 'all 0.2s',
+                      '&:hover': { borderColor: 'rgba(0,180,216,0.35)', color: '#E2E8F0', bgcolor: 'rgba(0,180,216,0.06)' },
+                    }}
+                  >
+                    <span style={{ fontSize: 13 }}>{tech.icon}</span> {tech.label}
+                  </Box>
+                ))}
+              </Box>
+            </Box>
           </Box>
 
           {/* Avatar side */}
@@ -247,6 +281,7 @@ export default function HeroSection() {
                   <Box sx={{ width: 8, height: 8, borderRadius: '50%', background: '#10B981', boxShadow: '0 0 8px #10B981' }} />
                   <Typography sx={{ fontSize: '0.72rem', color: '#94A3B8', fontWeight: 500 }}>Open to work</Typography>
                 </Box>
+
               </Box>
             </motion.div>
           </Box>
