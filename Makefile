@@ -26,7 +26,7 @@ dev-client:
 	cd client && npm run dev
 
 dev-backend:
-	cd backend && venv/bin/uvicorn app.main:app --reload --port 8000
+	cd backend && venv/bin/uvicorn app.main:app --reload --reload-dir app --port 8000
 
 build:
 	cd client && npm run build
