@@ -171,107 +171,48 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 
 ## Supabase Database Setup
 
-Run the following SQL in your Supabase SQL editor:
+Run [`backend/supabase_schema.sql`](backend/supabase_schema.sql) in the Supabase Dashboard → SQL Editor → New Query. It is the single source of truth for the schema and creates, in order:
 
-```sql
--- Profiles
-CREATE TABLE profiles (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  full_name TEXT NOT NULL,
-  title TEXT,
-  bio TEXT,
-  location TEXT,
-  email TEXT,
-  phone TEXT,
-  linkedin_url TEXT,
-  github_url TEXT,
-  leetcode_url TEXT,
-  resume_url TEXT,
-  avatar_url TEXT,
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
+- All 12 tables (`projects`, `skills`, `messages`, `resume_versions`, `chatbot_sessions`, `stats`, `achievements`, `certifications`, `experience`, `collaborations`, `settings`, `profile_photos`)
+- `updated_at` triggers on `projects` and `chatbot_sessions`
+- The `resumes` and `avatars` **Storage buckets** (public read) with their access policies
+- RLS disabled on every table — the FastAPI backend (JWT-protected admin routes) is the auth gatekeeper, not Postgres RLS
+- Seed data for stats/achievements/certifications/skills/experience/projects/collaborations — edit the seed `insert` statements at the bottom to match your own details before running
 
--- Projects
-CREATE TABLE projects (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  title TEXT NOT NULL,
-  description TEXT,
-  tech_stack TEXT[],
-  github_url TEXT,
-  live_url TEXT,
-  thumbnail_url TEXT,
-  is_featured BOOLEAN DEFAULT false,
-  is_github_repo BOOLEAN DEFAULT false,
-  github_repo_name TEXT,
-  display_order INT DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
+Re-running the script is safe — it starts with `drop table ... cascade` and `on conflict` upserts for the buckets.
 
--- Skills
-CREATE TABLE skills (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name TEXT NOT NULL,
-  category TEXT,
-  icon_url TEXT,
-  proficiency INT DEFAULT 80,
-  display_order INT DEFAULT 0
-);
+Also create one user in **Supabase Dashboard → Authentication → Users** (your own email) — `POST /api/admin/login` authenticates against Supabase Auth, and any authenticated user is treated as admin (see `require_admin` in `backend/app/middleware/auth.py`).
 
--- Messages (contact form)
-CREATE TABLE messages (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  sender_name TEXT NOT NULL,
-  sender_email TEXT NOT NULL,
-  subject TEXT,
-  body TEXT NOT NULL,
-  allow_email BOOLEAN DEFAULT false,
-  is_read BOOLEAN DEFAULT false,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
+---
 
--- Resume versions
-CREATE TABLE resume_versions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  file_name TEXT NOT NULL,
-  storage_path TEXT NOT NULL,
-  public_url TEXT NOT NULL,
-  is_active BOOLEAN DEFAULT false,
-  uploaded_at TIMESTAMPTZ DEFAULT now()
-);
+## Deploying
 
--- Chatbot sessions
-CREATE TABLE chatbot_sessions (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  session_id TEXT UNIQUE NOT NULL,
-  messages JSONB DEFAULT '[]',
-  ip_address TEXT,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
+Two separate Vercel projects, same GitHub repo:
 
--- Certifications
-CREATE TABLE certifications (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  title TEXT NOT NULL,
-  issuer TEXT,
-  issued_date DATE,
-  cert_url TEXT,
-  image_url TEXT,
-  display_order INT DEFAULT 0
-);
+### Backend (`backend/`)
+1. New Vercel project → Root Directory: `backend`. `vercel.json` already targets `api/index.py` with `@vercel/python`.
+2. Run `backend/supabase_schema.sql` against your Supabase project (see above) and create the two storage buckets + your admin user if you haven't already.
+3. Set these env vars in the Vercel project (values from `backend/.env.example`):
+   - `APP_ENV=production`
+   - `FRONTEND_ORIGIN` — your deployed frontend URL (CORS)
+   - `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_JWT_SECRET`
+   - `GITHUB_TOKEN`, `GITHUB_USERNAME`
+   - `GOOGLE_API_KEY`, `GOOGLE_ADK_MODEL`
+   - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `NOTIFY_EMAIL`
+   - `N8N_CONTACT_WEBHOOK_URL`, `N8N_GITHUB_SYNC_WEBHOOK_URL` (optional)
+   - `RATE_LIMIT_CHATBOT`, `RATE_LIMIT_CONTACT`
+4. Deploy, then note the resulting URL (e.g. `https://your-backend.vercel.app`).
 
--- RLS Policies
-ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Anyone can submit message" ON messages FOR INSERT WITH CHECK (true);
-CREATE POLICY "Admin reads messages" ON messages FOR SELECT USING (auth.role() = 'authenticated');
+### Frontend (`client/`)
+1. New Vercel project → Root Directory: `client`. `vercel.json` already rewrites all routes to `index.html` for the SPA.
+2. Set env vars (from `client/.env.example`):
+   - `VITE_API_BASE_URL` — the backend URL from step 4 above
+   - `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+3. Deploy.
+4. Go back to the backend project and update `FRONTEND_ORIGIN` to this frontend URL, then redeploy the backend.
 
-ALTER TABLE resume_versions ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Public reads active resume" ON resume_versions FOR SELECT USING (is_active = true);
-CREATE POLICY "Admin manages resumes" ON resume_versions FOR ALL USING (auth.role() = 'authenticated');
-```
-
-Also create a Supabase Storage bucket named **`resumes`** (public read).
+### n8n (optional)
+Import the workflow JSON files below if you want contact-form emails and GitHub sync; otherwise leave `N8N_*_WEBHOOK_URL` unset and those features just no-op.
 
 ---
 

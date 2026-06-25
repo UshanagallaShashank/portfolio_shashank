@@ -234,6 +234,33 @@ grant select, insert, update, delete on public.settings        to anon, authenti
 grant select, insert, update, delete on public.profile_photos  to anon, authenticated;
 
 -- ----------------------------------------------------------------
+-- Storage buckets (public read — used by resume.py and profile.py)
+-- ----------------------------------------------------------------
+insert into storage.buckets (id, name, public)
+values ('resumes', 'resumes', true)
+on conflict (id) do update set public = true;
+
+insert into storage.buckets (id, name, public)
+values ('avatars', 'avatars', true)
+on conflict (id) do update set public = true;
+
+drop policy if exists "Public read resumes" on storage.objects;
+create policy "Public read resumes" on storage.objects
+  for select using (bucket_id = 'resumes');
+
+drop policy if exists "Public read avatars" on storage.objects;
+create policy "Public read avatars" on storage.objects
+  for select using (bucket_id = 'avatars');
+
+drop policy if exists "Anon write resumes" on storage.objects;
+create policy "Anon write resumes" on storage.objects
+  for all using (bucket_id = 'resumes') with check (bucket_id = 'resumes');
+
+drop policy if exists "Anon write avatars" on storage.objects;
+create policy "Anon write avatars" on storage.objects
+  for all using (bucket_id = 'avatars') with check (bucket_id = 'avatars');
+
+-- ----------------------------------------------------------------
 -- Seed data  (edit to match your actual numbers before running)
 -- ----------------------------------------------------------------
 insert into public.stats (label, value, display_order) values
