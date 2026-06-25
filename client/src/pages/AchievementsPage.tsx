@@ -49,7 +49,10 @@ export default function AchievementsPage() {
           >
             {achievements.map((a) => {
               const card = (
-                <GlassCard sx={{ p: 3, textAlign: 'center' }}>
+                <GlassCard sx={{ p: 3, textAlign: 'center', position: 'relative' }}>
+                  {a.url && (
+                    <OpenInNewIcon sx={{ position: 'absolute', top: 10, right: 10, fontSize: '1rem', color: '#00B4D8' }} />
+                  )}
                   <Box sx={{ fontSize: '2rem', mb: 1 }}>{a.icon}</Box>
                   <Typography sx={{
                     fontSize: '1.4rem', fontWeight: 800,
@@ -57,7 +60,6 @@ export default function AchievementsPage() {
                     WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', mb: 0.5,
                   }}>
                     {a.label}
-                    {a.url && <OpenInNewIcon sx={{ fontSize: '0.9rem', ml: 0.5, verticalAlign: 'middle', WebkitTextFillColor: '#00B4D8' }} />}
                   </Typography>
                   <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.4, display: 'block' }}>
                     {a.detail}
