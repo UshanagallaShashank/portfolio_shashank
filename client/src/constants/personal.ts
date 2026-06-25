@@ -33,6 +33,7 @@ export const EXPERIENCE = [
     type: 'Full-time',
     highlights: [
       'Lumina AI Screen Share (featured by OpenAI for Business on LinkedIn): sole architect and developer of an AI-powered screen-share voice bot delivering autonomous real-time guidance for complex SaaS workflows with zero human agent intervention',
+      'Achieved 95% automatic issue resolution among early adopters with under 5 minutes average resolution time, combining voice, vision, and reasoning via the OpenAI Realtime model',
       'Built a multimodal pipeline — OpenAI vision + RAG knowledge base + WebRTC — that interprets the live screen, retrieves contextual help, and responds with adaptive voice guidance under 2s latency',
       'Automated step-by-step workflow guidance and error recovery, directly reducing support ticket volume and agent escalation rate',
       'Improved new-user onboarding accuracy through mid-session context-tracking that adapts guidance to real-time state changes',
@@ -120,7 +121,7 @@ export const CERTIFICATIONS = [
 ]
 
 export const ACHIEVEMENTS = [
-  { label: 'Featured by OpenAI', detail: 'Lumina AI Screen Share spotlighted by OpenAI for Business on LinkedIn', icon: '🚀' },
+  { label: 'Featured by OpenAI', detail: '95% of issues auto-resolved, <5 min average resolution — Lumina AI Screen Share spotlighted by OpenAI for Business on LinkedIn', icon: '🚀', url: 'https://www.linkedin.com/posts/ushanagallashashank_realpage-openai-luminascreenshare-activity-7447719185545228289-LFcG' },
   { label: '350+', detail: 'Problems solved on GeeksforGeeks', icon: '🧠' },
   { label: 'Top 9.5%', detail: 'LeetCode global ranking', icon: '🏆' },
   { label: 'Rank 350', detail: 'TCS CodeVita worldwide', icon: '🌍' },

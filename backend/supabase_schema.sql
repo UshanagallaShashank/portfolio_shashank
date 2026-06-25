@@ -131,6 +131,7 @@ create table public.achievements (
   label         text    not null,
   detail        text    not null,
   icon          text    not null default '🏆',
+  url           text,
   display_order int     not null default 0,
   is_visible    boolean not null default true
 );
@@ -269,13 +270,13 @@ insert into public.stats (label, value, display_order) values
   ('LeetCode Global', 'Top 9.5%',  3),
   ('CodeChef Rating', '4★',        4);
 
-insert into public.achievements (label, detail, icon, display_order) values
-  ('Featured by OpenAI', 'Lumina AI Screen Share spotlighted by OpenAI for Business on LinkedIn', '🚀', 1),
-  ('350+',     'Problems solved on GeeksforGeeks',            '🧠', 2),
-  ('Top 9.5%', 'LeetCode global ranking',                     '🏆', 3),
-  ('Rank 350', 'TCS CodeVita worldwide',                      '🌍', 4),
-  ('3rd Place','KMIT Code Sangram 2023 (200+ participants)',   '🥉', 5),
-  ('4-Star',   'CodeChef rating (Max: 1850)',                  '⭐', 6);
+insert into public.achievements (label, detail, icon, url, display_order) values
+  ('Featured by OpenAI', '95% of issues auto-resolved, <5 min average resolution — Lumina AI Screen Share spotlighted by OpenAI for Business on LinkedIn', '🚀', 'https://www.linkedin.com/posts/ushanagallashashank_realpage-openai-luminascreenshare-activity-7447719185545228289-LFcG', 1),
+  ('350+',     'Problems solved on GeeksforGeeks',            '🧠', null, 2),
+  ('Top 9.5%', 'LeetCode global ranking',                     '🏆', null, 3),
+  ('Rank 350', 'TCS CodeVita worldwide',                      '🌍', null, 4),
+  ('3rd Place','KMIT Code Sangram 2023 (200+ participants)',   '🥉', null, 5),
+  ('4-Star',   'CodeChef rating (Max: 1850)',                  '⭐', null, 6);
 
 insert into public.certifications (title, issuer, url, display_order) values
   ('HackerRank Problem Solving', 'HackerRank', 'https://www.hackerrank.com/certificates/23e555754a76', 1),
@@ -332,6 +333,7 @@ insert into public.experience (role, company, location, period, type, highlights
     'AI Engineer', 'RealPage Inc', 'Hyderabad', 'April 2025 – Present', 'Full-time',
     array[
       'Lumina AI Screen Share (featured by OpenAI for Business on LinkedIn): sole architect and developer of an AI-powered screen-share voice bot delivering autonomous real-time guidance for complex SaaS workflows with zero human agent intervention',
+      'Achieved 95% automatic issue resolution among early adopters with under 5 minutes average resolution time, combining voice, vision, and reasoning via the OpenAI Realtime model',
       'Built a multimodal pipeline — OpenAI vision + RAG knowledge base + WebRTC — that interprets the live screen, retrieves contextual help, and responds with adaptive voice guidance under 2s latency',
       'Automated step-by-step workflow guidance and error recovery, directly reducing support ticket volume and agent escalation rate',
       'Improved new-user onboarding accuracy through mid-session context-tracking that adapts guidance to real-time state changes',

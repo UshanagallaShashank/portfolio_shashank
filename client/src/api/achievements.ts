@@ -5,6 +5,7 @@ export interface Achievement {
   label: string
   detail: string
   icon: string
+  url?: string
   display_order: number
   is_visible: boolean
 }
