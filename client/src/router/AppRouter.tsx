@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Outlet, Navigate } from 'react-router-dom'
 import { Suspense, lazy } from 'react'
 import { Box } from '@mui/material'
 import Navbar from '../components/layout/Navbar'
@@ -58,6 +58,7 @@ export default function AppRouter() {
                 </ProtectedRoute>
               }
             />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
       </Box>
