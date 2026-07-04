@@ -131,6 +131,7 @@ create table public.achievements (
   label         text    not null,
   detail        text    not null,
   icon          text    not null default '🏆',
+  url           text,
   display_order int     not null default 0,
   is_visible    boolean not null default true
 );
@@ -234,20 +235,48 @@ grant select, insert, update, delete on public.settings        to anon, authenti
 grant select, insert, update, delete on public.profile_photos  to anon, authenticated;
 
 -- ----------------------------------------------------------------
+-- Storage buckets (public read — used by resume.py and profile.py)
+-- ----------------------------------------------------------------
+insert into storage.buckets (id, name, public)
+values ('resumes', 'resumes', true)
+on conflict (id) do update set public = true;
+
+insert into storage.buckets (id, name, public)
+values ('avatars', 'avatars', true)
+on conflict (id) do update set public = true;
+
+drop policy if exists "Public read resumes" on storage.objects;
+create policy "Public read resumes" on storage.objects
+  for select using (bucket_id = 'resumes');
+
+drop policy if exists "Public read avatars" on storage.objects;
+create policy "Public read avatars" on storage.objects
+  for select using (bucket_id = 'avatars');
+
+drop policy if exists "Anon write resumes" on storage.objects;
+create policy "Anon write resumes" on storage.objects
+  for all using (bucket_id = 'resumes') with check (bucket_id = 'resumes');
+
+drop policy if exists "Anon write avatars" on storage.objects;
+create policy "Anon write avatars" on storage.objects
+  for all using (bucket_id = 'avatars') with check (bucket_id = 'avatars');
+
+-- ----------------------------------------------------------------
 -- Seed data  (edit to match your actual numbers before running)
 -- ----------------------------------------------------------------
 insert into public.stats (label, value, display_order) values
-  ('Problems Solved', '350+',      1),
-  ('LeetCode Global', 'Top 9.5%',  2),
-  ('Years at RealPage', '1+',      3),
+  ('Years of Experience', '2+',     1),
+  ('Problems Solved', '350+',      2),
+  ('LeetCode Global', 'Top 9.5%',  3),
   ('CodeChef Rating', '4★',        4);
 
-insert into public.achievements (label, detail, icon, display_order) values
-  ('350+',     'Problems solved on GeeksforGeeks',            '🧠', 1),
-  ('Top 9.5%', 'LeetCode global ranking',                     '🏆', 2),
-  ('Rank 350', 'TCS CodeVita worldwide',                      '🌍', 3),
-  ('3rd Place','KMIT Code Sangram 2023 (200+ participants)',   '🥉', 4),
-  ('4-Star',   'CodeChef rating (Max: 1850)',                  '⭐', 5);
+insert into public.achievements (label, detail, icon, url, display_order) values
+  ('Featured by OpenAI', '95% of issues auto-resolved, <5 min average resolution — Lumina AI Screen Share spotlighted by OpenAI for Business on LinkedIn', '🚀', 'https://www.linkedin.com/posts/ushanagallashashank_realpage-openai-luminascreenshare-activity-7447719185545228289-LFcG', 1),
+  ('350+',     'Problems solved on GeeksforGeeks',            '🧠', null, 2),
+  ('Top 9.5%', 'LeetCode global ranking',                     '🏆', null, 3),
+  ('Rank 350', 'TCS CodeVita worldwide',                      '🌍', null, 4),
+  ('3rd Place','KMIT Code Sangram 2023 (200+ participants)',   '🥉', null, 5),
+  ('4-Star',   'CodeChef rating (Max: 1850)',                  '⭐', null, 6);
 
 insert into public.certifications (title, issuer, url, display_order) values
   ('HackerRank Problem Solving', 'HackerRank', 'https://www.hackerrank.com/certificates/23e555754a76', 1),
@@ -271,51 +300,66 @@ insert into public.skills (name, category, icon_url, proficiency, display_order)
   ('Google ADK',   'AI/GenAI',  '🤖', 85, 10),
   ('LangChain',    'AI/GenAI',  '🔗', 88, 11),
   ('LangGraph',    'AI/GenAI',  '📊', 85, 12),
-  ('RAG Pipelines','AI/GenAI',  '🧠', 88, 13),
+  ('RAG Pipelines','AI/GenAI',  '🧠', 90, 13),
   ('Gemini API',   'AI/GenAI',  '💎', 82, 14),
+  ('OpenAI APIs',  'AI/GenAI',  '🧩', 88, 15),
+  ('LLM Fine-tuning','AI/GenAI','🛠️', 80, 16),
+  ('Multimodal AI','AI/GenAI',  '🎛️', 82, 17),
+  ('MCP',          'AI/GenAI',  '🔌', 80, 18),
   -- Databases
-  ('PostgreSQL',   'Databases', '🐘', 82, 15),
-  ('MongoDB',      'Databases', '🍃', 85, 16),
-  ('Supabase',     'Databases', '⚡', 80, 17),
-  ('MySQL',        'Databases', '🐬', 78, 18),
+  ('PostgreSQL',   'Databases', '🐘', 85, 19),
+  ('MongoDB',      'Databases', '🍃', 85, 20),
+  ('Supabase',     'Databases', '⚡', 80, 21),
+  ('MySQL',        'Databases', '🐬', 78, 22),
+  ('Redis',        'Databases', '🟥', 82, 23),
+  ('pgvector',     'Databases', '🧮', 82, 24),
+  -- Cloud & MLOps
+  ('GCP',          'Cloud & MLOps', '☁️', 80, 25),
+  ('Docker',       'Cloud & MLOps', '🐳', 82, 26),
+  ('Kubernetes',   'Cloud & MLOps', '☸️', 75, 27),
+  ('CI/CD',        'Cloud & MLOps', '🔁', 85, 28),
   -- Tools
-  ('WebRTC',       'Tools',     '📡', 80, 19),
-  ('n8n',          'Tools',     '🔄', 78, 20),
-  ('WebSocket',    'Tools',     '🔌', 82, 21),
-  ('REST APIs',    'Tools',     '🌐', 90, 22),
-  ('Playwright',   'Tools',     '🎭', 78, 23),
-  ('Git',          'Tools',     '📝', 88, 24);
+  ('WebRTC',       'Tools',     '📡', 85, 29),
+  ('n8n',          'Tools',     '🔄', 78, 30),
+  ('WebSocket',    'Tools',     '🔌', 82, 31),
+  ('REST APIs',    'Tools',     '🌐', 90, 32),
+  ('Playwright',   'Tools',     '🎭', 78, 33),
+  ('Figma',        'Tools',     '🎨', 70, 34),
+  ('Postman',      'Tools',     '📮', 80, 35),
+  ('Git',          'Tools',     '📝', 88, 36);
 
 insert into public.experience (role, company, location, period, type, highlights, tech, display_order) values
   (
-    'Developer 1', 'RealPage Inc', 'Hyderabad', 'April 2025 – Present', 'Full-time',
+    'AI Engineer', 'RealPage Inc', 'Hyderabad', 'April 2025 – Present', 'Full-time',
     array[
-      'Designed and developed a screen-share voice bot using AI, RAG, and WebRTC for autonomous real-time user support in complex workflows',
-      'Built adaptive voice guidance and context-sensitive error handling, reducing ticket volume through reliable autonomous workflow support',
-      'Developed Genesis Salesforce Transcript Summarizer — real-time question generation and automated summary features for agent productivity',
-      'Built PDF Masker Tool: Python utility for detecting and masking sensitive invoice data with pipeline integration'
+      'Lumina AI Screen Share (featured by OpenAI for Business on LinkedIn): sole architect and developer of an AI-powered screen-share voice bot delivering autonomous real-time guidance for complex SaaS workflows with zero human agent intervention',
+      'Achieved 95% automatic issue resolution among early adopters with under 5 minutes average resolution time, combining voice, vision, and reasoning via the OpenAI Realtime model',
+      'Built a multimodal pipeline — OpenAI vision + RAG knowledge base + WebRTC — that interprets the live screen, retrieves contextual help, and responds with adaptive voice guidance under 2s latency',
+      'Automated step-by-step workflow guidance and error recovery, directly reducing support ticket volume and agent escalation rate',
+      'Improved new-user onboarding accuracy through mid-session context-tracking that adapts guidance to real-time state changes',
+      'Genesis — Salesforce Transcript Summariser & Ticket Mapper: built an LLM pipeline to ingest and summarise support transcripts, automating ticket classification and cutting agent triage time by ~30%',
+      'Added real-time question generation, automated summaries, and sentiment categorisation to Genesis with a modular design for shipping new analytics without touching the core pipeline',
+      'PDF Masker: built a Python utility to detect and mask PII and financial data across 100s of invoice PDFs per run, keeping the company compliant with data-privacy regulations',
+      'Integrated PDF Masker into existing data pipelines via CI/CD, eliminating 100% of manual redaction effort and cutting invoice processing time for the finance team'
     ],
-    array['Python', 'RAG', 'WebRTC', 'LangGraph', 'FastAPI', 'Salesforce'],
+    array['Python', 'OpenAI Vision', 'RAG', 'WebRTC', 'LangChain', 'FastAPI', 'Salesforce', 'CI/CD'],
     1
   ),
   (
-    'Developer Intern', 'RealPage Inc', 'Hyderabad', 'July 2024 – April 2025', 'Internship',
+    'AI Engineer Intern', 'RealPage Inc', 'Hyderabad', 'July 2024 – April 2025', 'Internship',
     array[
-      'Developed a web scraper achieving 80% data accuracy by integrating LangChain for enhanced data extraction',
-      'Enhanced data with AI-driven insights, reducing manual work by 90%',
-      'Implemented a categorizer to organize data efficiently, improving data retrieval processes',
-      'Integrated similarity search functionality to enhance data matching and retrieval accuracy'
+      'Built an LLM-enhanced web scraper (LangChain) that processed 50,000+ websites, achieving 80% data accuracy and cutting manual data-cleaning effort by 90%',
+      'Added a semantic similarity search and categorisation layer to organise and retrieve large datasets, improving retrieval precision across internal tools',
+      'Identified and proposed a data pipeline improvement adopted by the team, reducing repeated manual processing steps'
     ],
-    array['LangChain', 'Python', 'Similarity Search', 'Web Scraping'],
+    array['LangChain', 'Python', 'Semantic Search', 'Web Scraping'],
     2
   ),
   (
-    'Teaching Assistant', 'Iconnect NFS', 'Hyderabad', 'Feb 2024 – Apr 2024', 'Part-time',
+    'Teaching Assistant — MERN Stack', 'Iconnect NFS', 'Hyderabad', 'Feb 2024 – Apr 2024', 'Part-time',
     array[
-      'Facilitated MERN stack workshops for 100+ professionals, ensuring hands-on learning experience',
-      'Provided mentoring and technical support to enhance participants'' understanding',
-      'Developed supplementary materials and resources to support workshop content',
-      'Organized and led Q&A sessions to address participant queries'
+      'Ran hands-on MERN stack workshops for 100+ working professionals; led Q&A sessions and gave 1:1 technical support',
+      'Created reference materials and exercises used by participants to keep building independently post-workshop'
     ],
     array['React', 'Node.js', 'MongoDB', 'Express.js'],
     3
@@ -323,34 +367,44 @@ insert into public.experience (role, company, location, period, type, highlights
 
 insert into public.projects (title, description, tech_stack, category, github_url, live_url, is_featured, display_order) values
   (
-    'SkillEdge AI',
-    'AI-powered LeetCode assistant generating personalized study paths. Integrated automated reminders that reduced overall study time by 20%.',
-    array['React', 'AI', 'LeetCode API', 'Node.js'],
+    'RAGForge',
+    'Multi-tenant RAG SaaS platform (FastAPI + LangChain + pgvector + Redis) with BYOK support, tenant data isolation, and streamed responses with source citations. Async job queues (ARQ/Redis) handle the full ingestion-to-response pipeline end-to-end.',
+    array['FastAPI', 'LangChain', 'pgvector', 'Redis', 'React'],
     'AI/ML',
-    'https://github.com/UshanagallaShashank',
-    'https://problem-suggestor-frontend.vercel.app/',
+    'https://github.com/UshanagallaShashank/RAGForge',
+    null,
     true,
     1
   ),
   (
-    'Code-Renderer',
-    'Competitive programming platform featuring real-time code execution and live leaderboard updates using WebSocket.',
-    array['React', 'Node.js', 'WebSocket', 'Code Execution'],
-    'Full-Stack',
-    'https://github.com/UshanagallaShashank',
+    'Project Orbit',
+    'Voice-first multi-agent AI OS: a Google ADK orchestrator routes tasks across 8 specialised agents (TaskAgent, MentorAgent, MemoryAgent, JobAgent, MockAgent, and more) over the Gemini Live API at under 500ms latency, with hybrid Redis + PostgreSQL/pgvector memory and a React PWA terminal-style debug dashboard.',
+    array['Google ADK', 'Gemini Live API', 'Redis', 'PostgreSQL', 'pgvector', 'React'],
+    'AI/ML',
+    'https://github.com/UshanagallaShashank/Project-Orbit',
     null,
     true,
     2
   ),
   (
-    'Place-in',
-    'MERN stack placement portal for KMIT college, enabling seamless interaction between students and recruiters.',
-    array['React', 'Node.js', 'MongoDB', 'Express.js'],
-    'Full-Stack',
-    'https://github.com/UshanagallaShashank',
+    'PatchSense PRGuard',
+    'AI-powered PR reviewer that analyses diffs and automatically flags bugs, style violations, and security risks before code is merged.',
+    array['AI', 'Python', 'GitHub Actions'],
+    'AI/ML',
+    'https://github.com/UshanagallaShashank/PatchSense-PRGuard',
     null,
     true,
     3
+  ),
+  (
+    'ai_news_mcp',
+    'Open-source MCP (Model Context Protocol) server that streams curated AI news into Claude — a practical reference implementation of MCP for the developer community.',
+    array['MCP', 'Python', 'Claude'],
+    'Open Source',
+    'https://github.com/UshanagallaShashank/ai_news_mcp',
+    null,
+    true,
+    4
   );
 
 insert into public.settings (key, value) values

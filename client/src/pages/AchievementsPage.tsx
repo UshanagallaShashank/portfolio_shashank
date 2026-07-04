@@ -12,7 +12,7 @@ import { useApiCache } from '../hooks/useApiCache'
 import apiClient from '../api/client'
 import { PERSONAL } from '../constants/personal'
 
-interface Achievement { id: string; label: string; detail: string; icon: string; display_order: number }
+interface Achievement { id: string; label: string; detail: string; icon: string; url?: string; display_order: number }
 interface Certification { id: string; title: string; issuer: string; url: string; display_order: number }
 
 export default function AchievementsPage() {
@@ -47,9 +47,12 @@ export default function AchievementsPage() {
             animate={inView ? 'visible' : 'hidden'}
             sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(5, 1fr)' }, gap: 2, mb: 8 }}
           >
-            {achievements.map((a) => (
-              <motion.div key={a.id} variants={scaleIn}>
-                <GlassCard sx={{ p: 3, textAlign: 'center' }}>
+            {achievements.map((a) => {
+              const card = (
+                <GlassCard sx={{ p: 3, textAlign: 'center', position: 'relative' }}>
+                  {a.url && (
+                    <OpenInNewIcon sx={{ position: 'absolute', top: 10, right: 10, fontSize: '1rem', color: '#00B4D8' }} />
+                  )}
                   <Box sx={{ fontSize: '2rem', mb: 1 }}>{a.icon}</Box>
                   <Typography sx={{
                     fontSize: '1.4rem', fontWeight: 800,
@@ -62,8 +65,18 @@ export default function AchievementsPage() {
                     {a.detail}
                   </Typography>
                 </GlassCard>
-              </motion.div>
-            ))}
+              )
+              return (
+                <motion.div key={a.id} variants={scaleIn}>
+                  {a.url ? (
+                    <Box component="a" href={a.url} target="_blank" rel="noopener noreferrer"
+                      sx={{ display: 'block', textDecoration: 'none' }}>
+                      {card}
+                    </Box>
+                  ) : card}
+                </motion.div>
+              )
+            })}
           </Box>
         </Box>
 
